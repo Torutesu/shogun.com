@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { memo, useMemo, useState } from "react";
 import { cn } from "@shogun/ui";
 import type { FileEntry } from "@shogun/shared/types";
 import { Dropdown, DropdownItem } from "@/components/ui/dropdown";
@@ -34,7 +34,81 @@ function formatDate(dateStr: string): string {
   });
 }
 
-function FileIcon({ type }: { type: "file" | "directory" }) {
+interface FileRowProps {
+  file: FileEntry;
+  onNavigate: (name: string) => void;
+  onRename: (oldName: string, newName: string) => void;
+  onDownload: (name: string) => void;
+  onDelete: (name: string) => void;
+}
+
+const FileGridItem = memo(function FileGridItem({ file: f, onNavigate, onRename, onDownload, onDelete }: FileRowProps) {
+  return (
+    <div
+      className="group flex flex-col items-center gap-2 rounded-lg border border-light-border dark:border-dark-border p-3 cursor-pointer hover:bg-light-surface dark:hover:bg-dark-surface transition-colors relative"
+      onClick={() => onNavigate(f.name)}
+    >
+      <FileIcon type={f.type} />
+      <p className="text-xs text-center truncate w-full text-light-text dark:text-dark-text">{f.name}</p>
+      <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
+        <Dropdown
+          align="right"
+          trigger={
+            <span className="flex h-5 w-5 items-center justify-center rounded text-light-text-muted dark:text-dark-text-muted">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                <circle cx="12" cy="5" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="12" cy="19" r="2" />
+              </svg>
+            </span>
+          }
+        >
+          {f.type === "file" && <DropdownItem onClick={() => onDownload(f.name)}>Download</DropdownItem>}
+          <DropdownItem onClick={() => { const n = prompt("New name:", f.name); if (n) onRename(f.name, n); }}>Rename</DropdownItem>
+          <DropdownItem onClick={() => onDelete(f.name)} danger>Delete</DropdownItem>
+        </Dropdown>
+      </div>
+    </div>
+  );
+});
+
+const FileListRow = memo(function FileListRow({ file: f, onNavigate, onRename, onDownload, onDelete }: FileRowProps) {
+  return (
+    <tr
+      className="group border-b border-light-border/50 dark:border-dark-border/50 hover:bg-light-surface dark:hover:bg-dark-surface cursor-pointer transition-colors"
+      onClick={() => onNavigate(f.name)}
+    >
+      <td className="flex items-center gap-2 px-4 py-2 text-light-text dark:text-dark-text">
+        <FileIcon type={f.type} />
+        {f.name}
+      </td>
+      <td className="px-4 py-2 text-light-text-muted dark:text-dark-text-muted font-mono text-xs">
+        {f.type === "file" ? formatSize(f.size) : "--"}
+      </td>
+      <td className="px-4 py-2 text-light-text-muted dark:text-dark-text-muted text-xs">
+        {formatDate(f.modified)}
+      </td>
+      <td className="px-4 py-2" onClick={(e) => e.stopPropagation()}>
+        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+          <Dropdown
+            align="right"
+            trigger={
+              <span className="flex h-5 w-5 items-center justify-center rounded text-light-text-muted dark:text-dark-text-muted">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                  <circle cx="12" cy="5" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="12" cy="19" r="2" />
+                </svg>
+              </span>
+            }
+          >
+            {f.type === "file" && <DropdownItem onClick={() => onDownload(f.name)}>Download</DropdownItem>}
+            <DropdownItem onClick={() => { const n = prompt("New name:", f.name); if (n) onRename(f.name, n); }}>Rename</DropdownItem>
+            <DropdownItem onClick={() => onDelete(f.name)} danger>Delete</DropdownItem>
+          </Dropdown>
+        </div>
+      </td>
+    </tr>
+  );
+});
+
+const FileIcon = memo(function FileIcon({ type }: { type: "file" | "directory" }) {
   if (type === "directory") {
     return (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-gold">
@@ -48,7 +122,7 @@ function FileIcon({ type }: { type: "file" | "directory" }) {
       <polyline points="14 2 14 8 20 8" />
     </svg>
   );
-}
+});
 
 export function FileList({ files, viewMode, onNavigate, onRename, onDownload, onDelete }: FileListProps) {
   const [sortKey, setSortKey] = useState<SortKey>("name");
@@ -87,30 +161,7 @@ export function FileList({ files, viewMode, onNavigate, onRename, onDownload, on
     return (
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 p-4">
         {sorted.map((f) => (
-          <div
-            key={f.name}
-            className="group flex flex-col items-center gap-2 rounded-lg border border-light-border dark:border-dark-border p-3 cursor-pointer hover:bg-light-surface dark:hover:bg-dark-surface transition-colors relative"
-            onClick={() => onNavigate(f.name)}
-          >
-            <FileIcon type={f.type} />
-            <p className="text-xs text-center truncate w-full text-light-text dark:text-dark-text">{f.name}</p>
-            <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
-              <Dropdown
-                align="right"
-                trigger={
-                  <span className="flex h-5 w-5 items-center justify-center rounded text-light-text-muted dark:text-dark-text-muted">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                      <circle cx="12" cy="5" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="12" cy="19" r="2" />
-                    </svg>
-                  </span>
-                }
-              >
-                {f.type === "file" && <DropdownItem onClick={() => onDownload(f.name)}>Download</DropdownItem>}
-                <DropdownItem onClick={() => { const n = prompt("New name:", f.name); if (n) onRename(f.name, n); }}>Rename</DropdownItem>
-                <DropdownItem onClick={() => onDelete(f.name)} danger>Delete</DropdownItem>
-              </Dropdown>
-            </div>
-          </div>
+          <FileGridItem key={f.name} file={f} onNavigate={onNavigate} onRename={onRename} onDownload={onDownload} onDelete={onDelete} />
         ))}
       </div>
     );
@@ -129,40 +180,7 @@ export function FileList({ files, viewMode, onNavigate, onRename, onDownload, on
         </thead>
         <tbody>
           {sorted.map((f) => (
-            <tr
-              key={f.name}
-              className="group border-b border-light-border/50 dark:border-dark-border/50 hover:bg-light-surface dark:hover:bg-dark-surface cursor-pointer transition-colors"
-              onClick={() => onNavigate(f.name)}
-            >
-              <td className="flex items-center gap-2 px-4 py-2 text-light-text dark:text-dark-text">
-                <FileIcon type={f.type} />
-                {f.name}
-              </td>
-              <td className="px-4 py-2 text-light-text-muted dark:text-dark-text-muted font-mono text-xs">
-                {f.type === "file" ? formatSize(f.size) : "--"}
-              </td>
-              <td className="px-4 py-2 text-light-text-muted dark:text-dark-text-muted text-xs">
-                {formatDate(f.modified)}
-              </td>
-              <td className="px-4 py-2" onClick={(e) => e.stopPropagation()}>
-                <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Dropdown
-                    align="right"
-                    trigger={
-                      <span className="flex h-5 w-5 items-center justify-center rounded text-light-text-muted dark:text-dark-text-muted">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                          <circle cx="12" cy="5" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="12" cy="19" r="2" />
-                        </svg>
-                      </span>
-                    }
-                  >
-                    {f.type === "file" && <DropdownItem onClick={() => onDownload(f.name)}>Download</DropdownItem>}
-                    <DropdownItem onClick={() => { const n = prompt("New name:", f.name); if (n) onRename(f.name, n); }}>Rename</DropdownItem>
-                    <DropdownItem onClick={() => onDelete(f.name)} danger>Delete</DropdownItem>
-                  </Dropdown>
-                </div>
-              </td>
-            </tr>
+            <FileListRow key={f.name} file={f} onNavigate={onNavigate} onRename={onRename} onDownload={onDownload} onDelete={onDelete} />
           ))}
         </tbody>
       </table>

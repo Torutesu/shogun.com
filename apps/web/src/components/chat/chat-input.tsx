@@ -80,6 +80,7 @@ export function ChatInput({ onSend, model, onModelChange, disabled }: ChatInputP
           onKeyDown={handleKeyDown}
           placeholder="Ask anything..."
           disabled={disabled}
+          maxLength={100000}
           rows={1}
           className={cn(
             "flex-1 resize-none rounded-md border border-light-border dark:border-dark-border bg-transparent px-3 py-2 text-sm outline-none transition-colors",
@@ -93,6 +94,7 @@ export function ChatInput({ onSend, model, onModelChange, disabled }: ChatInputP
         <button
           onClick={handleSend}
           disabled={disabled || !value.trim()}
+          aria-label="Send message"
           className={cn(
             "flex h-9 w-9 items-center justify-center rounded-sm bg-gold text-dark transition-opacity cursor-pointer",
             "hover:bg-gold-dark disabled:opacity-40 disabled:cursor-not-allowed",
@@ -104,6 +106,9 @@ export function ChatInput({ onSend, model, onModelChange, disabled }: ChatInputP
           </svg>
         </button>
       </div>
+      <p className="mt-1 text-[0.65rem] text-light-text-dim dark:text-dark-text-dim px-1">
+        Shift+Enter for newline
+      </p>
     </div>
   );
 }

@@ -83,6 +83,7 @@ export function Header({ title, showModelSelector, selectedModel, onModelChange 
           <button
             key={l.code}
             onClick={() => setLocale(l.code)}
+            aria-label={`Switch language to ${l.label}`}
             className={cn(
               "px-2 py-1 font-mono text-[0.65rem] uppercase tracking-wider transition-colors cursor-pointer",
               locale === l.code
@@ -101,6 +102,7 @@ export function Header({ title, showModelSelector, selectedModel, onModelChange 
         onClick={toggleTheme}
         className="rounded-md p-1.5 text-light-text-muted dark:text-dark-text-muted hover:text-light-text dark:hover:text-dark-text hover:bg-light-surface dark:hover:bg-dark-surface transition-colors cursor-pointer"
         title={theme === "light" ? "Switch to dark" : "Switch to light"}
+        aria-label={theme === "light" ? "Switch to dark mode" : "Switch to light mode"}
       >
         {theme === "light" ? (
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">

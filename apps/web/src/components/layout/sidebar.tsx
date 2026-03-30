@@ -144,6 +144,7 @@ export function Sidebar({ user, machineStatus = "sleeping", collapsed: controlle
             collapsed && "justify-center px-2",
           )}
           title={collapsed ? item.label : undefined}
+          aria-label={item.label}
         >
           {item.icon}
           {!collapsed && <span>{item.label}</span>}
@@ -166,6 +167,7 @@ export function Sidebar({ user, machineStatus = "sleeping", collapsed: controlle
       {/* Mobile toggle */}
       <button
         onClick={toggle}
+        aria-label="Toggle sidebar"
         className="fixed top-3 left-3 z-40 rounded-lg p-2 text-light-text dark:text-dark-text md:hidden hover:bg-light-surface dark:hover:bg-dark-surface"
       >
         <IconMenu />
@@ -189,6 +191,7 @@ export function Sidebar({ user, machineStatus = "sleeping", collapsed: controlle
           </span>
           <button
             onClick={toggle}
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             className="ml-auto hidden rounded p-1 text-light-text-muted dark:text-dark-text-muted hover:text-light-text dark:hover:text-dark-text md:block"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">

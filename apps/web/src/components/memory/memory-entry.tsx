@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { cn } from "@shogun/ui";
 import type { MemoryEntry as MemoryEntryType, MemorySource } from "@shogun/shared/types";
 import { Badge } from "@/components/ui/badge";
@@ -78,7 +79,7 @@ function formatTimestamp(dateStr: string): string {
   });
 }
 
-export function MemoryEntryCard({ entry, onDelete }: MemoryEntryProps) {
+export const MemoryEntryCard = memo(function MemoryEntryCard({ entry, onDelete }: MemoryEntryProps) {
   return (
     <div className="group rounded-lg border border-light-border dark:border-dark-border bg-light-card dark:bg-dark-card p-4 transition-colors hover:border-light-border-dim dark:hover:border-dark-border-bright">
       <div className="flex items-start gap-3">
@@ -124,4 +125,4 @@ export function MemoryEntryCard({ entry, onDelete }: MemoryEntryProps) {
       </div>
     </div>
   );
-}
+});

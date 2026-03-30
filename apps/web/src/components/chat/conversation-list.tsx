@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { memo, useMemo, useState } from "react";
 import { cn } from "@shogun/ui";
 import { Dropdown, DropdownItem } from "@/components/ui/dropdown";
 
@@ -161,7 +161,7 @@ interface ConversationItemProps {
   onDelete: () => void;
 }
 
-function ConversationItem({ conversation, active, onSelect, onRename, onPin, onDelete }: ConversationItemProps) {
+const ConversationItem = memo(function ConversationItem({ conversation, active, onSelect, onRename, onPin, onDelete }: ConversationItemProps) {
   const [renaming, setRenaming] = useState(false);
   const [newTitle, setNewTitle] = useState(conversation.title);
 
@@ -234,4 +234,4 @@ function ConversationItem({ conversation, active, onSelect, onRename, onPin, onD
       </div>
     </div>
   );
-}
+});

@@ -12,11 +12,14 @@
     "type-check": "turbo type-check",
     "clean": "turbo clean",
     "db:generate": "turbo db:generate --filter=@shogun/db",
-    "db:migrate": "turbo db:migrate --filter=@shogun/db"
+    "db:migrate": "turbo db:migrate --filter=@shogun/db",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "devDependencies": {
     "turbo": "^2.4.0",
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "vitest": "^3.2.4"
   },
   "engines": {
     "node": ">=20.0.0"

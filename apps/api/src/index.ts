@@ -1,9 +1,10 @@
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { logger } from "hono/logger";
 
 import { errorHandler } from "./middleware/error";
+import { requestIdMiddleware } from "./middleware/request-id";
+import { jsonLogger } from "./middleware/json-logger";
 import { authMiddleware } from "./middleware/auth";
 import { rateLimitMiddleware } from "./middleware/rate-limit";
 import { machineGuard } from "./middleware/machine-guard";
@@ -27,7 +28,8 @@ const app = new Hono();
 // ---------------------------------------------------------------------------
 // Global middleware
 // ---------------------------------------------------------------------------
-app.use("*", logger());
+app.use("*", requestIdMiddleware);
+app.use("*", jsonLogger);
 app.use(
   "*",
   cors({

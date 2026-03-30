@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { memo, useState } from "react";
 import { cn } from "@shogun/ui";
 import type { ChatMessage, ToolCall, ToolResult } from "@shogun/shared/types";
 import { Badge } from "@/components/ui/badge";
@@ -56,7 +56,7 @@ function ToolCallCard({ call, result }: { call: ToolCall; result?: ToolResult })
   );
 }
 
-export function MessageBubble({ message, isStreaming }: MessageBubbleProps) {
+export const MessageBubble = memo(function MessageBubble({ message, isStreaming }: MessageBubbleProps) {
   const isUser = message.role === "user";
 
   return (
@@ -92,4 +92,4 @@ export function MessageBubble({ message, isStreaming }: MessageBubbleProps) {
       </div>
     </div>
   );
-}
+});
