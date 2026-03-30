@@ -28,7 +28,7 @@ export default function Features({ locale }: FeaturesProps) {
           {pillars.map((pillar) => (
             <div
               key={pillar.num}
-              className="border-l-2 border-gold-dark bg-light-card rounded-lg p-8 md:p-10"
+              className="lp-animate border-l-2 border-gold-dark bg-light-card rounded-lg p-8 md:p-10"
             >
               {/* Tag */}
               <p className="font-mono text-[0.62rem] tracking-[0.2em] uppercase text-light-text-muted mb-3">

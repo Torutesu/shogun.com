@@ -20,7 +20,7 @@ export default function Pain({ locale }: PainProps) {
       <div className="mx-auto max-w-[1200px]">
         {/* Title */}
         <h2
-          className="font-display tracking-[0.04em] text-light-text leading-[1.05] max-w-3xl"
+          className="lp-animate font-display tracking-[0.04em] text-light-text leading-[1.05] max-w-3xl"
           style={{
             fontSize: "clamp(2.5rem, 6vw, 5rem)",
           }}
@@ -33,7 +33,7 @@ export default function Pain({ locale }: PainProps) {
           {quotes.map((quote, i) => (
             <div
               key={i}
-              className="relative bg-light-card border border-light-border rounded-lg p-8"
+              className="lp-animate relative bg-light-card border border-light-border rounded-lg p-8"
             >
               <span
                 className="absolute top-4 left-5 font-display text-6xl text-gold/20 leading-none select-none"
@@ -49,7 +49,7 @@ export default function Pain({ locale }: PainProps) {
         </div>
 
         {/* Body */}
-        <p className="mt-14 font-body font-light text-[clamp(0.95rem,1.5vw,1.1rem)] text-light-text leading-[1.7] max-w-2xl">
+        <p className="lp-animate mt-14 font-body font-light text-[clamp(0.95rem,1.5vw,1.1rem)] text-light-text leading-[1.7] max-w-2xl">
           {t(locale, "lp.pain.body")}
         </p>
       </div>

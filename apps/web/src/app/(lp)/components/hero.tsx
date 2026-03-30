@@ -41,8 +41,7 @@ export default function Hero({ locale }: HeroProps) {
             fontSize: "clamp(5.5rem, 16vw, 14rem)",
           }}
         >
-          SHOGU
-          <span className="text-gold">N</span>
+          SHO<span className="text-gold">G</span>UN
         </h1>
 
         {/* Tagline */}
