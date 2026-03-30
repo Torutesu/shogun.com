@@ -4,11 +4,13 @@ import { cors } from "hono/cors";
 
 import { errorHandler } from "./middleware/error";
 import { requestIdMiddleware } from "./middleware/request-id";
+import { metricsMiddleware } from "./middleware/metrics";
 import { jsonLogger } from "./middleware/json-logger";
 import { authMiddleware } from "./middleware/auth";
 import { rateLimitMiddleware } from "./middleware/rate-limit";
 import { machineGuard } from "./middleware/machine-guard";
 
+import metricsRoutes from "./routes/metrics";
 import authRoutes from "./routes/auth";
 import profileRoutes from "./routes/profile";
 import chatRoutes from "./routes/chat";
@@ -29,6 +31,7 @@ const app = new Hono();
 // Global middleware
 // ---------------------------------------------------------------------------
 app.use("*", requestIdMiddleware);
+app.use("*", metricsMiddleware);
 app.use("*", jsonLogger);
 app.use(
   "*",
@@ -43,6 +46,11 @@ app.onError(errorHandler);
 // Health check (no auth)
 // ---------------------------------------------------------------------------
 app.get("/", (c) => c.json({ status: "ok", service: "shogun-api" }));
+
+// ---------------------------------------------------------------------------
+// Prometheus metrics (no auth — for scraping)
+// ---------------------------------------------------------------------------
+app.route("/metrics", metricsRoutes);
 
 // ---------------------------------------------------------------------------
 // Public routes (no auth required)

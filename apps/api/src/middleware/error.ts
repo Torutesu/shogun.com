@@ -1,5 +1,6 @@
 import type { ErrorHandler } from "hono";
 import { ZodError } from "zod";
+import { captureException, isSentryInitialized } from "../lib/sentry";
 
 export const errorHandler: ErrorHandler = (err, c) => {
   // Zod validation errors
@@ -38,6 +39,9 @@ export const errorHandler: ErrorHandler = (err, c) => {
 
   // Unexpected errors
   console.error("Unhandled error:", err);
+  if (isSentryInitialized()) {
+    captureException(err);
+  }
   return c.json(
     {
       error: {
