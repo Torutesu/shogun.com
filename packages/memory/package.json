@@ -16,6 +16,7 @@
     "@shogun/db": "workspace:*",
     "@shogun/shared": "workspace:*",
     "@shogun/transcription": "workspace:*",
+    "@supabase/supabase-js": "^2.49.0",
     "zod": "^3.24.0"
   },
   "devDependencies": {

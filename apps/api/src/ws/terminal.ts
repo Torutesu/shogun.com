@@ -172,7 +172,7 @@ terminal.get("/ws", async (c) => {
     agentWs.close();
   };
 
-  return response ?? c.text("", 101);
+  return response ?? new Response(null, { status: 101 });
 });
 
 export default terminal;

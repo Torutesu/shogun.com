@@ -181,6 +181,9 @@ importers:
         specifier: ^2.49.0
         version: 2.100.1
     devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.19.15
       supabase:
         specifier: ^2.20.0
         version: 2.84.4
@@ -200,6 +203,9 @@ importers:
         specifier: ^3.24.0
         version: 3.25.76
     devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.19.15
       typescript:
         specifier: ^5.7.0
         version: 5.9.3
@@ -215,6 +221,9 @@ importers:
       '@shogun/transcription':
         specifier: workspace:*
         version: link:../transcription
+      '@supabase/supabase-js':
+        specifier: ^2.49.0
+        version: 2.100.1
       zod:
         specifier: ^3.24.0
         version: 3.25.76
@@ -245,6 +254,9 @@ importers:
         specifier: ^3.24.0
         version: 3.25.76
     devDependencies:
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.19.15
       typescript:
         specifier: ^5.7.0
         version: 5.9.3

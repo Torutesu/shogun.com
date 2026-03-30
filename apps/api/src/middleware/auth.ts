@@ -4,7 +4,8 @@ import { getEnv } from "../lib/env";
 
 export type AuthVariables = {
   userId: string;
-  supabase: ReturnType<typeof createClient>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  supabase: ReturnType<typeof createClient<any>>;
 };
 
 /**

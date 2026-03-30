@@ -18,7 +18,7 @@ export class TranscriptionService {
     filename: string,
     language?: string,
   ): Promise<TranscriptionResult> {
-    const file = new File([audioBuffer], filename, { type: "audio/webm" });
+    const file = new File([new Uint8Array(audioBuffer)], filename, { type: "audio/webm" });
 
     const response = await this.client.audio.transcriptions.create({
       model: "whisper-1",

@@ -108,7 +108,7 @@ async function executeToolCall(
             body: JSON.stringify({ model: "text-embedding-3-small", input: text }),
           });
           const data = (await res.json()) as { data: Array<{ embedding: number[] }> };
-          return data.data[0].embedding;
+          return data.data[0]?.embedding ?? [];
         },
         generateSummary: async () => "",
       });
