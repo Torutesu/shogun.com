@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@shogun/ui";
 import { HANDLE_REGEX, RESERVED_HANDLES } from "@shogun/shared/constants";
+import { createSupabaseBrowser } from "@/lib/supabase";
 import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,10 +45,22 @@ export default function OnboardingPage() {
     }
     setHandleChecking(true);
     try {
-      const { available } = await api.auth.checkHandle(value);
-      setHandleError(available ? null : "This handle is already taken");
+      // Check directly via Supabase (no API server needed)
+      const supabase = createSupabaseBrowser();
+      if (supabase) {
+        const { data } = await supabase
+          .from("profiles")
+          .select("id")
+          .eq("handle", value)
+          .maybeSingle();
+        setHandleError(data ? "This handle is already taken" : null);
+      } else {
+        // Supabase not configured — allow any handle in dev
+        setHandleError(null);
+      }
     } catch {
-      setHandleError("Could not check availability");
+      // If check fails, allow continuing (API might be down)
+      setHandleError(null);
     } finally {
       setHandleChecking(false);
     }
