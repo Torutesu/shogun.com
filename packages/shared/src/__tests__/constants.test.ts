@@ -173,8 +173,8 @@ describe("FLY_REGIONS", () => {
   });
 
   it("nrt is Tokyo, Japan", () => {
-    expect(FLY_REGIONS.nrt.name).toBe("Tokyo");
-    expect(FLY_REGIONS.nrt.location).toBe("Japan");
+    expect(FLY_REGIONS["nrt"]!.name).toBe("Tokyo");
+    expect(FLY_REGIONS["nrt"]!.location).toBe("Japan");
   });
 });
 

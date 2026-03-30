@@ -117,7 +117,8 @@ export function parseTimeExpression(query: string, _locale?: Locale): TimeRange 
   const sortedKeys = Object.keys(expressions).sort((a, b) => b.length - a.length);
   for (const key of sortedKeys) {
     if (normalized.includes(key)) {
-      return expressions[key](now);
+      const fn = expressions[key];
+      if (fn) return fn(now);
     }
   }
 
