@@ -184,6 +184,32 @@ const en = {
   "lp.footer.copyright": "© 2026 Select KK. All rights reserved.",
   "lp.footer.privacy": "Privacy",
   "lp.footer.terms": "Terms",
+
+  // Team
+  "team.title": "Team",
+  "team.create": "Create a team",
+  "team.members": "Members",
+  "team.shared": "Shared",
+  "team.audit": "Audit",
+  "team.settings": "Settings",
+  "team.invite": "Invite",
+  "team.remove": "Remove",
+  "team.leave": "Leave team",
+  "team.role.owner": "Owner",
+  "team.role.admin": "Admin",
+  "team.role.member": "Member",
+  "team.role.viewer": "Viewer",
+  "team.sso.title": "SSO / SAML",
+  "team.sso.configure": "Configure SSO",
+  "team.sso.entityId": "SAML Entity ID",
+  "team.sso.ssoUrl": "SSO URL",
+  "team.sso.certificate": "Certificate",
+  "team.audit.action.created": "Created",
+  "team.audit.action.updated": "Updated",
+  "team.audit.action.deleted": "Deleted",
+  "team.audit.action.shared": "Shared",
+  "team.audit.action.invited": "Invited",
+  "team.audit.action.removed": "Removed",
 } as const;
 
 export default en;

@@ -113,3 +113,23 @@ export const addChannelSchema = z.object({
   channel: z.enum(["sms", "line", "email"]),
   identifier: z.string().min(1).max(256),
 });
+
+// Teams
+export const createTeamSchema = z.object({
+  name: z.string().min(1).max(100),
+  slug: z.string().min(2).max(50).regex(/^[a-z0-9-]+$/, "Slug must be lowercase alphanumeric with hyphens"),
+});
+
+export const updateTeamSchema = z.object({
+  name: z.string().min(1).max(100).optional(),
+  avatar_url: z.string().url().optional(),
+});
+
+export const inviteMemberSchema = z.object({
+  email: z.string().email(),
+  role: z.enum(["admin", "member", "viewer"]),
+});
+
+export const updateMemberRoleSchema = z.object({
+  role: z.enum(["admin", "member", "viewer"]),
+});

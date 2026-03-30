@@ -186,6 +186,32 @@ const ja: Record<keyof typeof en, string> = {
   "lp.footer.copyright": "© 2026 Select KK. All rights reserved.",
   "lp.footer.privacy": "プライバシー",
   "lp.footer.terms": "利用規約",
+
+  // Team
+  "team.title": "チーム",
+  "team.create": "チームを作成",
+  "team.members": "メンバー",
+  "team.shared": "共有",
+  "team.audit": "監査ログ",
+  "team.settings": "設定",
+  "team.invite": "招待",
+  "team.remove": "削除",
+  "team.leave": "チームを退出",
+  "team.role.owner": "オーナー",
+  "team.role.admin": "管理者",
+  "team.role.member": "メンバー",
+  "team.role.viewer": "閲覧者",
+  "team.sso.title": "SSO / SAML",
+  "team.sso.configure": "SSOを設定",
+  "team.sso.entityId": "SAMLエンティティID",
+  "team.sso.ssoUrl": "SSO URL",
+  "team.sso.certificate": "証明書",
+  "team.audit.action.created": "作成",
+  "team.audit.action.updated": "更新",
+  "team.audit.action.deleted": "削除",
+  "team.audit.action.shared": "共有",
+  "team.audit.action.invited": "招待",
+  "team.audit.action.removed": "除名",
 };
 
 export default ja;

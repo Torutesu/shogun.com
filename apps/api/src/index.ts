@@ -23,6 +23,10 @@ import modelRoutes from "./routes/models";
 import serviceRoutes from "./routes/services";
 import automationRoutes from "./routes/automations";
 import notificationRoutes from "./routes/notifications";
+import teamRoutes from "./routes/teams";
+import teamSharingRoutes from "./routes/team-sharing";
+import auditRoutes from "./routes/audit";
+import ssoRoutes from "./routes/sso";
 import terminalRoutes from "./ws/terminal";
 
 const app = new Hono();
@@ -84,6 +88,10 @@ authed.route("/billing", billingRoutes);
 authed.route("/keys", keyRoutes);
 authed.route("/models", modelRoutes);
 authed.route("/notifications", notificationRoutes);
+authed.route("/teams", teamRoutes);
+authed.route("/teams", teamSharingRoutes);
+authed.route("/teams", auditRoutes);
+authed.route("/sso", ssoRoutes);
 authed.route("/terminal", terminalRoutes);
 
 // ---------------------------------------------------------------------------

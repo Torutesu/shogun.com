@@ -186,6 +186,32 @@ const es: Record<keyof typeof en, string> = {
   "lp.footer.copyright": "© 2026 Select KK. Todos los derechos reservados.",
   "lp.footer.privacy": "Privacidad",
   "lp.footer.terms": "Términos",
+
+  // Team
+  "team.title": "Equipo",
+  "team.create": "Crear equipo",
+  "team.members": "Miembros",
+  "team.shared": "Compartido",
+  "team.audit": "Registro de auditoría",
+  "team.settings": "Configuración",
+  "team.invite": "Invitar",
+  "team.remove": "Eliminar",
+  "team.leave": "Salir del equipo",
+  "team.role.owner": "Propietario",
+  "team.role.admin": "Administrador",
+  "team.role.member": "Miembro",
+  "team.role.viewer": "Observador",
+  "team.sso.title": "SSO / SAML",
+  "team.sso.configure": "Configurar SSO",
+  "team.sso.entityId": "ID de entidad SAML",
+  "team.sso.ssoUrl": "URL de SSO",
+  "team.sso.certificate": "Certificado",
+  "team.audit.action.created": "Creado",
+  "team.audit.action.updated": "Actualizado",
+  "team.audit.action.deleted": "Eliminado",
+  "team.audit.action.shared": "Compartido",
+  "team.audit.action.invited": "Invitado",
+  "team.audit.action.removed": "Eliminado",
 };
 
 export default es;

@@ -350,6 +350,155 @@ export const api = {
   },
 
   // -------------------------------------------------------------------------
+  // Teams
+  // -------------------------------------------------------------------------
+  teams: {
+    list() {
+      return request<{ id: string; name: string; slug: string; memberCount: number; createdAt: string }[]>(
+        "/api/teams",
+      );
+    },
+    create(data: { name: string; slug: string }) {
+      return request<{ id: string; name: string; slug: string; memberCount: number; createdAt: string }>(
+        "/api/teams",
+        { method: "POST", body: JSON.stringify(data) },
+      );
+    },
+    get(id: string) {
+      return request<{ id: string; name: string; slug: string; memberCount: number; createdAt: string }>(
+        `/api/teams/${id}`,
+      );
+    },
+    update(id: string, data: { name?: string; slug?: string }) {
+      return request<void>(`/api/teams/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify(data),
+      });
+    },
+    delete(id: string) {
+      return request<void>(`/api/teams/${id}`, { method: "DELETE" });
+    },
+    getMembers(id: string) {
+      return request<{
+        id: string;
+        userId: string;
+        displayName: string;
+        email: string;
+        avatarUrl?: string;
+        role: string;
+        joinedAt: string;
+      }[]>(`/api/teams/${id}/members`);
+    },
+    invite(id: string, data: { email: string; role: string }) {
+      return request<{ id: string; email: string; role: string; createdAt: string }>(
+        `/api/teams/${id}/invites`,
+        { method: "POST", body: JSON.stringify(data) },
+      );
+    },
+    removeMember(id: string, userId: string) {
+      return request<void>(`/api/teams/${id}/members/${userId}`, { method: "DELETE" });
+    },
+    updateRole(id: string, userId: string, role: string) {
+      return request<void>(`/api/teams/${id}/members/${userId}/role`, {
+        method: "PATCH",
+        body: JSON.stringify({ role }),
+      });
+    },
+    getInvites(id: string) {
+      return request<{ id: string; email: string; role: string; createdAt: string }[]>(
+        `/api/teams/${id}/invites`,
+      );
+    },
+    cancelInvite(id: string, inviteId: string) {
+      return request<void>(`/api/teams/${id}/invites/${inviteId}`, { method: "DELETE" });
+    },
+    shareConversation(teamId: string, conversationId: string) {
+      return request<{
+        id: string;
+        conversationId: string;
+        title: string;
+        sharedBy: string;
+        sharedAt: string;
+      }>(`/api/teams/${teamId}/shared/conversations`, {
+        method: "POST",
+        body: JSON.stringify({ conversationId }),
+      });
+    },
+    getSharedConversations(teamId: string) {
+      return request<{
+        id: string;
+        conversationId: string;
+        title: string;
+        sharedBy: string;
+        sharedAt: string;
+      }[]>(`/api/teams/${teamId}/shared/conversations`);
+    },
+    shareMemory(teamId: string, entryId: string) {
+      return request<{
+        id: string;
+        entryId: string;
+        content: string;
+        source: string;
+        sharedBy: string;
+        sharedAt: string;
+      }>(`/api/teams/${teamId}/shared/memory`, {
+        method: "POST",
+        body: JSON.stringify({ entryId }),
+      });
+    },
+    getSharedMemory(teamId: string) {
+      return request<{
+        id: string;
+        entryId: string;
+        content: string;
+        source: string;
+        sharedBy: string;
+        sharedAt: string;
+      }[]>(`/api/teams/${teamId}/shared/memory`);
+    },
+    getAuditLogs(
+      teamId: string,
+      params?: { action?: string; user?: string; from?: string; to?: string; limit?: number; offset?: number },
+    ) {
+      const qs = new URLSearchParams();
+      if (params?.action) qs.set("action", params.action);
+      if (params?.user) qs.set("user", params.user);
+      if (params?.from) qs.set("from", params.from);
+      if (params?.to) qs.set("to", params.to);
+      if (params?.limit) qs.set("limit", String(params.limit));
+      if (params?.offset) qs.set("offset", String(params.offset));
+      return request<{
+        entries: {
+          id: string;
+          userId: string;
+          userName: string;
+          action: string;
+          resource: string;
+          details: string;
+          createdAt: string;
+        }[];
+      }>(`/api/teams/${teamId}/audit?${qs}`);
+    },
+    getSSOConfig(teamId: string) {
+      return request<{ enabled: boolean; entityId: string; ssoUrl: string; certificate: string }>(
+        `/api/teams/${teamId}/sso`,
+      );
+    },
+    setSSOConfig(
+      teamId: string,
+      config: { enabled: boolean; entityId: string; ssoUrl: string; certificate: string },
+    ) {
+      return request<void>(`/api/teams/${teamId}/sso`, {
+        method: "PUT",
+        body: JSON.stringify(config),
+      });
+    },
+    deleteSSOConfig(teamId: string) {
+      return request<void>(`/api/teams/${teamId}/sso`, { method: "DELETE" });
+    },
+  },
+
+  // -------------------------------------------------------------------------
   // API Keys (BYOK)
   // -------------------------------------------------------------------------
   apiKeys: {

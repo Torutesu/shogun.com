@@ -130,6 +130,54 @@ export interface FileEntry {
   modified: string;
 }
 
+// Team
+export type TeamRole = "owner" | "admin" | "member" | "viewer";
+export type InviteStatus = "pending" | "accepted" | "declined" | "expired";
+
+export interface Team {
+  id: string;
+  name: string;
+  slug: string;
+  avatarUrl?: string;
+  ownerId: string;
+  maxMembers: number;
+  plan: SubscriptionTier;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TeamMember {
+  id: string;
+  teamId: string;
+  userId: string;
+  role: TeamRole;
+  joinedAt: string;
+  profile?: UserProfile;
+}
+
+export interface TeamInvite {
+  id: string;
+  teamId: string;
+  email: string;
+  role: TeamRole;
+  invitedBy: string;
+  status: InviteStatus;
+  expiresAt: string;
+  createdAt: string;
+}
+
+export interface AuditLogEntry {
+  id: string;
+  teamId: string;
+  userId: string;
+  action: string;
+  resourceType: string;
+  resourceId?: string;
+  metadata: Record<string, unknown>;
+  ipAddress?: string;
+  createdAt: string;
+}
+
 // API error
 export interface APIError {
   code: string;
