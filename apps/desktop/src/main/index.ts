@@ -15,6 +15,7 @@ import { captureService } from "./capture";
 import { transcriptionService } from "./transcription";
 import { syncService } from "./sync";
 import { createTray, destroyTray, updateTrayMenu } from "./tray";
+import { initUpdater, stopUpdater } from "./updater";
 
 // ---------------------------------------------------------------------------
 // Single Instance Lock
@@ -255,6 +256,9 @@ app.on("ready", async () => {
       app.setLoginItemSettings({ openAtLogin: true });
     }
 
+    // 11. Initialize auto-updater
+    await initUpdater();
+
     console.log("[main] SHOGUN Desktop initialized");
   } catch (err) {
     console.error("[main] Initialization error:", err);
@@ -292,6 +296,7 @@ app.on("before-quit", async () => {
   try {
     await captureService.destroy();
     syncService.stop();
+    stopUpdater();
     closeStore();
     destroyTray();
   } catch (err) {
