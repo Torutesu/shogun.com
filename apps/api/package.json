@@ -1,0 +1,33 @@
+{
+  "name": "@shogun/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsup src/index.ts --format esm --dts",
+    "start": "node dist/index.js",
+    "lint": "eslint src/",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@shogun/ai": "workspace:*",
+    "@shogun/db": "workspace:*",
+    "@shogun/infra": "workspace:*",
+    "@shogun/memory": "workspace:*",
+    "@shogun/shared": "workspace:*",
+    "@shogun/transcription": "workspace:*",
+    "hono": "^4.7.0",
+    "@hono/node-server": "^1.14.0",
+    "@hono/zod-validator": "^0.5.0",
+    "@supabase/supabase-js": "^2.49.0",
+    "stripe": "^17.0.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsup": "^8.4.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}
