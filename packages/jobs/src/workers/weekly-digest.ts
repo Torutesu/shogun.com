@@ -1,102 +1,118 @@
 import { Worker, type Job } from "bullmq";
-import { getRedisConnection } from "../connection";
 import { createServerClient } from "@shogun/db";
+import { getRedisConnection } from "../connection";
 
-export interface WeeklyDigestJob {
+export interface WeeklyDigestData {
   userId: string;
   timezone: string;
 }
 
-async function generateDigestSummary(entriesBySource: Record<string, number>, topContent: string): Promise<string> {
-  const apiKey = process.env.OPENAI_API_KEY ?? process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) throw new Error("Missing AI API key for digest generation");
-
-  const sourceSummary = Object.entries(entriesBySource)
-    .map(([source, count]) => `${source}: ${count} entries`)
-    .join(", ");
-
-  const res = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are a productivity assistant. Generate a concise weekly digest summary starting with 'This week you worked on...' " +
-            "Highlight key themes, projects, and accomplishments. Keep it under 300 words.",
-        },
-        {
-          role: "user",
-          content: `Sources breakdown: ${sourceSummary}\n\nSample content from the week:\n${topContent}`,
-        },
-      ],
-      max_tokens: 500,
-    }),
-  });
-
-  if (!res.ok) throw new Error(`OpenAI API error: ${res.status}`);
-
-  const data = (await res.json()) as { choices: Array<{ message: { content: string } }> };
-  return data.choices[0]?.message.content ?? "This week you worked on various tasks.";
-}
-
-export function createWeeklyDigestWorker(): Worker<WeeklyDigestJob> {
-  return new Worker<WeeklyDigestJob>(
+/**
+ * Worker: weekly-digest
+ * Runs every Monday at 9:00 AM (user's timezone).
+ * Fetches memory entries from the past 7 days, groups by app/source,
+ * generates an AI summary, and stores it as a memory_entry.
+ */
+export function createWeeklyDigestWorker() {
+  return new Worker<WeeklyDigestData>(
     "weekly-digest",
-    async (job: Job<WeeklyDigestJob>) => {
+    async (job: Job<WeeklyDigestData>) => {
       const { userId } = job.data;
       const supabase = createServerClient();
+      const apiKey = process.env.OPENAI_API_KEY;
+      if (!apiKey) throw new Error("Missing OPENAI_API_KEY");
 
-      // Fetch memory entries from the past 7 days
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      // Calculate date range (past 7 days)
+      const now = new Date();
+      const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
+      // Fetch memory entries from the past week
       const { data: entries, error } = await supabase
         .from("memory_entries")
-        .select("id, source, content, summary, app_name, captured_at")
+        .select("source, app_name, summary, content, captured_at")
         .eq("user_id", userId)
-        .gte("captured_at", sevenDaysAgo.toISOString())
-        .order("captured_at", { ascending: false });
+        .gte("captured_at", weekAgo.toISOString())
+        .lte("captured_at", now.toISOString())
+        .order("captured_at", { ascending: true });
 
-      if (error) throw new Error(`Failed to fetch entries: ${error.message}`);
-      if (!entries || entries.length === 0) return; // Nothing to digest
+      if (error) throw error;
+      if (!entries || entries.length === 0) return { skipped: true };
 
-      // Group by source
-      const bySource: Record<string, number> = {};
+      // Group by source/app
+      const groups: Record<string, string[]> = {};
       for (const entry of entries) {
-        const src = entry.source ?? "unknown";
-        bySource[src] = (bySource[src] ?? 0) + 1;
+        const key = entry.app_name ?? entry.source;
+        if (!groups[key]) groups[key] = [];
+        const text = entry.summary ?? entry.content?.slice(0, 200) ?? "";
+        if (text) groups[key].push(text);
       }
 
-      // Collect top content for summary (use summaries when available, fall back to content)
-      const topContent = entries
-        .slice(0, 30)
-        .map((e) => e.summary ?? e.content?.slice(0, 200) ?? "")
-        .filter(Boolean)
-        .join("\n---\n");
+      // Build context for AI summary
+      const contextLines: string[] = [];
+      for (const [source, items] of Object.entries(groups)) {
+        contextLines.push(`## ${source} (${items.length} entries)`);
+        // Include up to 10 samples per group
+        for (const item of items.slice(0, 10)) {
+          contextLines.push(`- ${item}`);
+        }
+      }
+      const context = contextLines.join("\n");
 
       // Generate AI summary
-      const digestContent = await generateDigestSummary(bySource, topContent);
+      const res = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages: [
+            {
+              role: "system",
+              content:
+                "You are a personal productivity assistant. Generate a weekly digest summary for the user. " +
+                "Start with \"This week you worked on...\" and provide a concise overview of their activities " +
+                "grouped by app or source. Keep it under 300 words. Be specific about what was accomplished.",
+            },
+            {
+              role: "user",
+              content: `Here are my work memory entries from the past week:\n\n${context}`,
+            },
+          ],
+          max_tokens: 500,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error(`OpenAI API error: ${res.status} ${await res.text()}`);
+      }
+
+      const data = (await res.json()) as {
+        choices: Array<{ message: { content: string } }>;
+      };
+      const digestContent = data.choices[0]?.message.content ?? "";
+
+      if (!digestContent) return { skipped: true };
 
       // Store as a memory entry
-      await supabase.from("memory_entries").insert({
+      const { error: insertError } = await supabase.from("memory_entries").insert({
         user_id: userId,
         source: "manual",
         content: digestContent,
-        summary: `Weekly digest: ${Object.keys(bySource).join(", ")} — ${entries.length} entries`,
+        summary: `Weekly digest: ${weekAgo.toISOString().slice(0, 10)} to ${now.toISOString().slice(0, 10)}`,
         app_name: "shogun-digest",
-        captured_at: new Date().toISOString(),
-        metadata: { type: "weekly_digest", period_start: sevenDaysAgo.toISOString(), entry_count: entries.length, sources: bySource },
+        captured_at: now.toISOString(),
+        metadata: { type: "weekly_digest" },
       });
+
+      if (insertError) throw insertError;
+
+      return { userId, entriesProcessed: entries.length };
     },
     {
       connection: getRedisConnection(),
-      concurrency: 3,
+      concurrency: 5,
     },
   );
 }

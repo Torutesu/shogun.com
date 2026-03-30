@@ -15,9 +15,11 @@ export function getRedisConnection(): IORedis {
   return _connection;
 }
 
-export async function closeRedisConnection(): Promise<void> {
+export function closeRedisConnection(): Promise<void> {
   if (_connection) {
-    await _connection.quit();
+    const conn = _connection;
     _connection = null;
+    return conn.quit().then(() => undefined);
   }
+  return Promise.resolve();
 }

@@ -1,53 +1,56 @@
 import { Queue } from "bullmq";
 import { getRedisConnection } from "./connection";
 
-function createQueue(name: string, defaultOpts?: { attempts?: number; backoffType?: string; backoffDelay?: number }) {
-  return new Queue(name, {
+// ---------------------------------------------------------------------------
+// Queue definitions
+// ---------------------------------------------------------------------------
+
+function createQueue<T>(name: string) {
+  return new Queue<T>(name, {
     connection: getRedisConnection(),
     defaultJobOptions: {
-      attempts: defaultOpts?.attempts ?? 3,
-      backoff: {
-        type: (defaultOpts?.backoffType as "exponential" | "fixed") ?? "exponential",
-        delay: defaultOpts?.backoffDelay ?? 2000,
-      },
+      attempts: 3,
+      backoff: { type: "exponential", delay: 2000 },
       removeOnComplete: { count: 1000 },
       removeOnFail: { count: 5000 },
     },
   });
 }
 
-export const memorySummarizeQueue = createQueue("memory-summarize", {
-  attempts: 3,
-  backoffType: "exponential",
-  backoffDelay: 2000,
-});
+// ---------------------------------------------------------------------------
+// Job data types
+// ---------------------------------------------------------------------------
 
-export const memoryEmbedQueue = createQueue("memory-embed", {
-  attempts: 3,
-  backoffType: "exponential",
-  backoffDelay: 2000,
-});
+export interface MemorySummarizeData {
+  entryId: string;
+  content: string;
+}
 
-export const machineLifecycleQueue = createQueue("machine-lifecycle", {
-  attempts: 5,
-  backoffType: "exponential",
-  backoffDelay: 5000,
-});
+export interface MemoryEmbedData {
+  entryId: string;
+  content: string;
+}
 
-export const automationScheduleQueue = createQueue("automation-schedule", {
-  attempts: 1,
-  backoffType: "fixed",
-  backoffDelay: 60000,
-});
+export interface MachineLifecycleData {
+  userId: string;
+  action: "start" | "stop" | "provision" | "deprovision";
+}
 
-export const backupSyncQueue = createQueue("backup-sync", {
-  attempts: 3,
-  backoffType: "exponential",
-  backoffDelay: 10000,
-});
+export interface AutomationScheduleData {
+  tick: number; // unix timestamp of the tick
+}
 
-export const weeklyDigestQueue = createQueue("weekly-digest", {
-  attempts: 3,
-  backoffType: "exponential",
-  backoffDelay: 5000,
-});
+export interface BackupSyncData {
+  userId: string;
+  machineId: string;
+}
+
+// ---------------------------------------------------------------------------
+// Queue instances
+// ---------------------------------------------------------------------------
+
+export const memorySummarizeQueue = createQueue<MemorySummarizeData>("memory-summarize");
+export const memoryEmbedQueue = createQueue<MemoryEmbedData>("memory-embed");
+export const machineLifecycleQueue = createQueue<MachineLifecycleData>("machine-lifecycle");
+export const automationScheduleQueue = createQueue<AutomationScheduleData>("automation-schedule");
+export const backupSyncQueue = createQueue<BackupSyncData>("backup-sync");

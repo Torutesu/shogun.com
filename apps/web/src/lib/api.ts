@@ -255,6 +255,13 @@ export const api = {
     delete(id: string) {
       return request<void>(`/api/memory/${id}`, { method: "DELETE" });
     },
+    exportUrl(format: "json" | "csv", from?: string, to?: string) {
+      const qs = new URLSearchParams({ format });
+      if (from) qs.set("from", from);
+      if (to) qs.set("to", to);
+      const token = getToken();
+      return `${API_BASE}/api/memory/export?${qs}${token ? `&token=${token}` : ""}`;
+    },
     updateSettings(settings: { captureEnabled: boolean; intervalSeconds: number; retentionDays: number; excludedApps: string[] }) {
       return request<void>("/api/memory/settings", {
         method: "PATCH",

@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
-import { captureMemorySchema, searchMemorySchema } from "@shogun/shared";
+import { captureMemorySchema, searchMemorySchema, parseTimeExpression } from "@shogun/shared";
 import { createServerClient } from "@shogun/db";
 import { MemoryService } from "@shogun/memory";
 import type { AuthVariables } from "../middleware/auth";
@@ -132,6 +132,60 @@ memory.delete("/:id", async (c) => {
 });
 
 // ---------------------------------------------------------------------------
+// GET /export - export memory entries as JSON or CSV
+// ---------------------------------------------------------------------------
+memory.get("/export", async (c) => {
+  const userId = c.get("userId");
+  const supabase = createServerClient();
+
+  const format = c.req.query("format") ?? "json";
+  const from = c.req.query("from");
+  const to = c.req.query("to");
+
+  let query = supabase
+    .from("memory_entries")
+    .select("id, source, content, summary, app_name, captured_at, created_at")
+    .eq("user_id", userId)
+    .order("captured_at", { ascending: false });
+
+  if (from) query = query.gte("captured_at", from);
+  if (to) query = query.lte("captured_at", to);
+
+  const { data, error } = await query;
+
+  if (error) {
+    return c.json({ error: { code: "EXPORT_FAILED", message: error.message, status: 500 } }, 500);
+  }
+
+  const entries = data ?? [];
+
+  if (format === "csv") {
+    const header = "id,source,app_name,summary,captured_at,created_at,content";
+    const escapeCSV = (val: string | null | undefined) => {
+      if (val == null) return "";
+      const s = String(val).replace(/"/g, '""');
+      return s.includes(",") || s.includes('"') || s.includes("\n") ? `"${s}"` : s;
+    };
+    const rows = entries.map((e) =>
+      [e.id, e.source, e.app_name, e.summary, e.captured_at, e.created_at, e.content]
+        .map(escapeCSV)
+        .join(","),
+    );
+    const csv = [header, ...rows].join("\n");
+
+    return new Response(csv, {
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": "attachment; filename=memory-export.csv",
+      },
+    });
+  }
+
+  // Default: JSON
+  return c.json({ entries });
+});
+
+// ---------------------------------------------------------------------------
 // POST /search - semantic search
 // ---------------------------------------------------------------------------
 memory.post("/search", zValidator("json", searchMemorySchema), async (c) => {
@@ -140,14 +194,19 @@ memory.post("/search", zValidator("json", searchMemorySchema), async (c) => {
   const supabase = createServerClient();
   const service = createMemoryService(supabase);
 
+  // Parse time expressions from the query before searching
+  const timeRange = parseTimeExpression(body.query);
+  const dateFrom = body.date_from ?? (timeRange.from ? timeRange.from.toISOString() : undefined);
+  const dateTo = body.date_to ?? (timeRange.to ? timeRange.to.toISOString() : undefined);
+
   try {
     const results = await service.search({
       userId,
       query: body.query,
       limit: body.limit,
       source: body.source,
-      dateFrom: body.date_from,
-      dateTo: body.date_to,
+      dateFrom,
+      dateTo,
     });
     return c.json({ results });
   } catch (err) {

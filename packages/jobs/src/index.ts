@@ -8,11 +8,19 @@ export {
   machineLifecycleQueue,
   automationScheduleQueue,
   backupSyncQueue,
-  weeklyDigestQueue,
+} from "./queues";
+
+export type {
+  MemorySummarizeData,
+  MemoryEmbedData,
+  MachineLifecycleData,
+  AutomationScheduleData,
+  BackupSyncData,
 } from "./queues";
 
 // Workers
-export { createMemorySummarizeWorker, type MemorySummarizeJob } from "./workers/memory-summarize";
-export { createMemoryEmbedWorker, type MemoryEmbedJob } from "./workers/memory-embed";
-export { createAutomationScheduleWorker, type AutomationScheduleJob } from "./workers/automation-schedule";
-export { createWeeklyDigestWorker, type WeeklyDigestJob } from "./workers/weekly-digest";
+export { createMemorySummarizeWorker } from "./workers/memory-summarize";
+export { createMemoryEmbedWorker } from "./workers/memory-embed";
+export { createAutomationScheduleWorker } from "./workers/automation-schedule";
+export { createWeeklyDigestWorker } from "./workers/weekly-digest";
+export type { WeeklyDigestData } from "./workers/weekly-digest";

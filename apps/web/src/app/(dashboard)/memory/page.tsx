@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { cn } from "@shogun/ui";
 import type { MemoryEntry, MemorySource } from "@shogun/shared/types";
 import { api } from "@/lib/api";
@@ -74,14 +74,60 @@ export default function MemoryPage() {
     }
   }, [hasMore, loadingMore, filter, loadEntries]);
 
+  const [exportOpen, setExportOpen] = useState(false);
+  const exportRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (exportRef.current && !exportRef.current.contains(e.target as Node)) {
+        setExportOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleExport = (format: "json" | "csv") => {
+    const url = api.memory.exportUrl(format);
+    window.open(url, "_blank");
+    setExportOpen(false);
+  };
+
   return (
     <div className="flex h-full flex-col">
       <Header title="Memory" />
 
       <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4" onScroll={handleScroll}>
-        {/* Search */}
-        <div className="mb-4">
-          <MemorySearch onDelete={handleDelete} />
+        {/* Search + Export */}
+        <div className="mb-4 flex items-start gap-2">
+          <div className="flex-1">
+            <MemorySearch onDelete={handleDelete} />
+          </div>
+          <div className="relative" ref={exportRef}>
+            <button
+              onClick={() => setExportOpen(!exportOpen)}
+              className="rounded-lg border border-light-border dark:border-dark-border px-3 py-2.5 text-sm font-mono uppercase tracking-wider text-light-text-muted dark:text-dark-text-muted hover:border-gold hover:text-gold transition-colors cursor-pointer"
+            >
+              Export
+            </button>
+            {exportOpen && (
+              <div className="absolute right-0 top-full mt-1 z-10 min-w-[120px] rounded-lg border border-light-border dark:border-dark-border bg-light-card dark:bg-dark-card shadow-lg">
+                <button
+                  onClick={() => handleExport("json")}
+                  className="block w-full px-4 py-2 text-left text-sm text-light-text dark:text-dark-text hover:bg-light-surface dark:hover:bg-dark-surface transition-colors cursor-pointer"
+                >
+                  JSON
+                </button>
+                <button
+                  onClick={() => handleExport("csv")}
+                  className="block w-full px-4 py-2 text-left text-sm text-light-text dark:text-dark-text hover:bg-light-surface dark:hover:bg-dark-surface transition-colors cursor-pointer"
+                >
+                  CSV
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Filter pills */}
