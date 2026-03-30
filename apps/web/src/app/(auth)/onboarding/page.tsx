@@ -23,7 +23,7 @@ export default function OnboardingPage() {
   const [lineId, setLineId] = useState("");
   const [provisionProgress, setProvisionProgress] = useState(0);
   const [loading, setLoading] = useState(false);
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const currentIdx = STEPS.indexOf(step);
   const progress = ((currentIdx + 1) / STEPS.length) * 100;
