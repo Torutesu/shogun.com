@@ -52,8 +52,7 @@ async function callAgent(machineId: string, path: string, method: string, body?:
   if (!/^[a-z0-9-]+$/.test(machineId)) {
     throw new Error("Invalid machine ID format");
   }
-  // TODO: resolve actual Fly internal address once container agent is built
-  const agentUrl = `http://${machineId}.vm.flycast:8080${path}`;
+  const agentUrl = `http://${machineId}.vm.flycast:9000${path}`;
   const res = await fetch(agentUrl, {
     method,
     headers: { "Content-Type": "application/json" },
@@ -135,8 +134,39 @@ async function executeToolCall(
       return JSON.stringify(results);
     }
     case "web_search": {
-      // TODO: integrate with a web search API
-      return JSON.stringify({ results: [], message: "Web search not yet implemented" });
+      const query = String(input.query || "").trim();
+      if (!query) return JSON.stringify({ error: "Empty search query" });
+
+      const searchApiKey = process.env.BRAVE_SEARCH_API_KEY;
+      if (!searchApiKey) {
+        // Fallback: use DuckDuckGo instant answer API (no key needed)
+        const ddgUrl = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1`;
+        const res = await fetch(ddgUrl);
+        const data = await res.json();
+        return JSON.stringify({
+          results: data.RelatedTopics?.slice(0, 5).map((t: any) => ({
+            title: t.Text?.split(" - ")[0] || "",
+            snippet: t.Text || "",
+            url: t.FirstURL || "",
+          })) ?? [],
+          source: "duckduckgo",
+        });
+      }
+
+      // Brave Search API
+      const res = await fetch(
+        `https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(query)}&count=5`,
+        { headers: { "Accept": "application/json", "Accept-Encoding": "gzip", "X-Subscription-Token": searchApiKey } }
+      );
+      const data = await res.json();
+      return JSON.stringify({
+        results: data.web?.results?.slice(0, 5).map((r: any) => ({
+          title: r.title,
+          snippet: r.description,
+          url: r.url,
+        })) ?? [],
+        source: "brave",
+      });
     }
     case "deploy": {
       if (!machineId) return JSON.stringify({ error: "No machine available" });

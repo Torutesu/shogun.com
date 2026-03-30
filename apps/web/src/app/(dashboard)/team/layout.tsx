@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { cn } from "@shogun/ui";
 import { Header } from "@/components/layout/header";
 
@@ -19,11 +20,37 @@ const tabs: Tab[] = [
   { href: "/team/settings", label: "Settings", requireAdmin: true },
 ];
 
+type TeamRole = "owner" | "admin" | "member" | "viewer";
+
+function useTeamRole(): TeamRole {
+  const [role, setRole] = useState<TeamRole>("member");
+
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchRole() {
+      try {
+        const res = await fetch("/api/teams/my-role", { credentials: "include" });
+        if (res.ok) {
+          const data = await res.json();
+          if (!cancelled && data.role) {
+            setRole(data.role as TeamRole);
+          }
+        }
+      } catch {
+        // On error, default to "member" (least privilege)
+      }
+    }
+    fetchRole();
+    return () => { cancelled = true; };
+  }, []);
+
+  return role;
+}
+
 export default function TeamLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
-  // TODO: fetch user role from team context; for now show all tabs
-  const userRole: "owner" | "admin" | "member" | "viewer" = "owner";
+  const userRole = useTeamRole();
   const isAdmin = userRole === "owner" || userRole === "admin";
 
   const visibleTabs = tabs.filter((t) => !t.requireAdmin || isAdmin);

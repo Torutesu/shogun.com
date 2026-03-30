@@ -14,7 +14,7 @@ const automations = new Hono<{ Variables: AutomationVariables }>();
 // ---------------------------------------------------------------------------
 
 async function callAgent(machineId: string, path: string, method: string, body?: unknown): Promise<unknown> {
-  const agentUrl = `http://${machineId}.vm.flycast:8080${path}`;
+  const agentUrl = `http://${machineId}.vm.flycast:9000${path}`;
   const res = await fetch(agentUrl, {
     method,
     headers: { "Content-Type": "application/json" },

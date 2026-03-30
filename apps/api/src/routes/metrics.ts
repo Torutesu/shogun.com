@@ -121,7 +121,7 @@ function serializeHistograms(): string {
 
     let cumulative = 0;
     for (let i = 0; i < DURATION_BUCKETS.length; i++) {
-      cumulative += data.buckets[i];
+      cumulative += data.buckets[i] ?? 0;
       lines.push(`${name}_bucket{${labelPrefix}le="${DURATION_BUCKETS[i]}"} ${cumulative}`);
     }
     lines.push(`${name}_bucket{${labelPrefix}le="+Inf"} ${data.count}`);

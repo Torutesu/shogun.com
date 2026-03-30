@@ -32,6 +32,67 @@ const MAX_VERIFY_ATTEMPTS = 5;
 const VERIFY_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
 
 // ---------------------------------------------------------------------------
+// Send verification code via SMS / Email / LINE
+// ---------------------------------------------------------------------------
+
+async function sendVerificationCode(channel: string, identifier: string, code: string): Promise<void> {
+  switch (channel) {
+    case "sms": {
+      const accountSid = process.env.TWILIO_ACCOUNT_SID;
+      const authToken = process.env.TWILIO_AUTH_TOKEN;
+      const from = process.env.TWILIO_PHONE_NUMBER;
+      if (!accountSid || !authToken || !from) {
+        console.warn("[notifications] Twilio not configured, skipping SMS");
+        return;
+      }
+      await fetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`, {
+        method: "POST",
+        headers: {
+          Authorization: "Basic " + Buffer.from(`${accountSid}:${authToken}`).toString("base64"),
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({ To: identifier, From: from, Body: `Your SHOGUN verification code: ${code}` }),
+      });
+      break;
+    }
+    case "email": {
+      const sgKey = process.env.SENDGRID_API_KEY;
+      if (!sgKey) {
+        console.warn("[notifications] SendGrid not configured, skipping email");
+        return;
+      }
+      await fetch("https://api.sendgrid.com/v3/mail/send", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${sgKey}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          personalizations: [{ to: [{ email: identifier }] }],
+          from: { email: "noreply@syogun.com", name: "SHOGUN" },
+          subject: "Your SHOGUN verification code",
+          content: [{ type: "text/plain", value: `Your verification code: ${code}\n\nThis code expires in 10 minutes.` }],
+        }),
+      });
+      break;
+    }
+    case "line": {
+      const token = process.env.LINE_CHANNEL_ACCESS_TOKEN;
+      if (!token) {
+        console.warn("[notifications] LINE not configured, skipping");
+        return;
+      }
+      await fetch("https://api.line.me/v2/bot/message/push", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: identifier,
+          messages: [{ type: "text", text: `Your SHOGUN verification code: ${code}` }],
+        }),
+      });
+      break;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
 // GET /channels - list notification channels
 // ---------------------------------------------------------------------------
 notifications.get("/channels", async (c) => {
@@ -86,9 +147,7 @@ notifications.post("/channels", zValidator("json", addChannelSchema), async (c) 
   }
 
   // Send verification code via the appropriate channel
-  // TODO: integrate with actual SMS/email/LINE services
-  // For now, the code is stored and can be retrieved for testing
-  console.log(`[notifications] Verification code sent for ${channel}:${identifier}`);
+  await sendVerificationCode(channel, identifier, verificationCode);
 
   return c.json({ channel: data }, 201);
 });

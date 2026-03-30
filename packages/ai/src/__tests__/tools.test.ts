@@ -64,7 +64,7 @@ describe("shell_exec tool", () => {
 
   it("has command property of type string", () => {
     const properties = tool.inputSchema.properties as Record<string, { type: string }>;
-    expect(properties.command.type).toBe("string");
+    expect(properties["command"]!.type).toBe("string");
   });
 
   it("includes optional working_directory and timeout_ms", () => {

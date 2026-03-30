@@ -19,8 +19,7 @@ async function callAgent(
   body?: unknown,
   headers?: Record<string, string>,
 ): Promise<Response> {
-  // TODO: resolve actual Fly internal address once container agent is built
-  const agentUrl = `http://${machineId}.vm.flycast:8080${path}`;
+  const agentUrl = `http://${machineId}.vm.flycast:9000${path}`;
   return fetch(agentUrl, {
     method,
     headers: { "Content-Type": "application/json", ...headers },
