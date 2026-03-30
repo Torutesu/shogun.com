@@ -109,14 +109,136 @@ function createOpenAIClient(apiKey: string): AIClient {
   };
 }
 
-function createGeminiClient(_apiKey: string): AIClient {
-  // Gemini integration — placeholder for Phase 1
-  // Will use @google/generative-ai SDK
+function createGeminiClient(apiKey: string): AIClient {
   return {
-    async stream({ onEvent }) {
+    async stream({ model, messages, systemPrompt, tools, onEvent }) {
+      // Map messages to Gemini format
+      const contents = messages.map((m) => ({
+        role: m.role === "assistant" ? "model" : "user",
+        parts: [{ text: m.content }],
+      }));
+
+      // Build request body
+      const body: Record<string, unknown> = {
+        contents,
+        generationConfig: {
+          maxOutputTokens: 8192,
+        },
+      };
+
+      // Add system instruction if provided
+      if (systemPrompt) {
+        body.systemInstruction = { parts: [{ text: systemPrompt }] };
+      }
+
+      // Map tool definitions to Gemini function calling format
+      if (tools && tools.length > 0) {
+        const toolDefs = tools as Array<{
+          name: string;
+          description: string;
+          inputSchema?: Record<string, unknown>;
+          input_schema?: Record<string, unknown>;
+        }>;
+        body.tools = [
+          {
+            functionDeclarations: toolDefs.map((t) => ({
+              name: t.name,
+              description: t.description,
+              parameters: t.inputSchema ?? t.input_schema ?? { type: "object", properties: {} },
+            })),
+          },
+        ];
+      }
+
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:streamGenerateContent?alt=sse&key=${apiKey}`;
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      if (!res.ok) {
+        const errText = await res.text();
+        onEvent({ type: "error", message: `Gemini API error ${res.status}: ${errText}` });
+        return;
+      }
+
+      if (!res.body) {
+        onEvent({ type: "error", message: "No response body from Gemini" });
+        return;
+      }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let totalInputTokens = 0;
+      let totalOutputTokens = 0;
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          const data = line.slice(6).trim();
+          if (!data) continue;
+
+          try {
+            const parsed = JSON.parse(data) as {
+              candidates?: Array<{
+                content?: {
+                  parts?: Array<{
+                    text?: string;
+                    functionCall?: { name: string; args: Record<string, unknown> };
+                  }>;
+                };
+              }>;
+              usageMetadata?: {
+                promptTokenCount?: number;
+                candidatesTokenCount?: number;
+              };
+            };
+
+            // Extract usage metadata
+            if (parsed.usageMetadata) {
+              totalInputTokens = parsed.usageMetadata.promptTokenCount ?? totalInputTokens;
+              totalOutputTokens = parsed.usageMetadata.candidatesTokenCount ?? totalOutputTokens;
+            }
+
+            // Process content parts
+            const parts = parsed.candidates?.[0]?.content?.parts;
+            if (parts) {
+              for (const part of parts) {
+                if (part.text) {
+                  onEvent({ type: "delta", content: part.text });
+                }
+                if (part.functionCall) {
+                  onEvent({
+                    type: "tool_call",
+                    name: part.functionCall.name,
+                    input: part.functionCall.args,
+                  });
+                }
+              }
+            }
+          } catch {
+            // skip malformed SSE lines
+          }
+        }
+      }
+
       onEvent({
-        type: "error",
-        message: "Gemini integration coming soon",
+        type: "done",
+        usage: {
+          inputTokens: totalInputTokens,
+          outputTokens: totalOutputTokens,
+          costCents: 0,
+        },
       });
     },
   };
