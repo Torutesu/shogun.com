@@ -80,11 +80,12 @@ Two persistent WebSocket connections per active session:
 
 **Terminal WebSocket** (`/ws/terminal`):
 ```
-Browser (xterm.js) ←→ API Server ←→ Fly Machine (SSH/exec)
+Browser (xterm.js) ←→ API Server ←→ Container Agent (Fly private network)
 ```
-- API server proxies stdin/stdout between browser and user's machine
-- Auth via JWT in initial handshake
+- API server proxies stdin/stdout via container agent (no SSH needed)
+- Auth via one-time WebSocket ticket (30s expiry, single-use JWT)
 - Heartbeat every 30s, reconnect on drop
+- PTY session kept alive 5min after disconnect (resume support)
 
 **Chat Streaming** (`/ws/chat`):
 ```
@@ -277,3 +278,109 @@ Each provider has different tool/function calling formats. The `@shogun/ai` pack
 - **api.syogun.com** → Fly.io (Hono API)
 - **{handle}.syogun.com** → Fly.io (user's hosted services, proxied)
 - **Cloudflare R2** → file storage per user
+
+## Container Agent Architecture
+
+Each user container runs a lightweight **agent sidecar** (Go binary, ~5MB) on port 9000 inside Fly's private network. The API communicates with containers exclusively through this agent — no SSH, no public ports.
+
+```
+Browser → Hono API (public) → Fly internal network → Container Agent (:9000)
+```
+
+**Agent responsibilities:**
+- File system operations (list, read, write, delete)
+- PTY session management (spawn shell, resize, I/O relay)
+- Script execution (for automations and AI tool use)
+- Health checks and idle reporting
+- Activity tracking for auto-stop
+
+**Security:** Agent validates a per-machine JWT on every request. The JWT contains a `machine_id` claim signed with `HMAC(master_secret, machine_id)`. Even if Machine A discovers Machine B's internal IP, it cannot forge a valid token.
+
+**Auto-stop flow:**
+```
+Agent tracks last activity (keystroke, file op, AI tool, automation)
+  → No activity for auto_stop_after interval
+  → Agent reports idle to API
+  → API stops machine via Fly API
+  → On next user action: API wakes machine (~300ms), waits for health check
+  → Frontend shows boot animation during wake
+```
+
+## WebSocket Ticket Authentication
+
+WebSocket connections use short-lived tickets instead of long-lived tokens:
+
+```
+1. Client: POST /terminal/ticket → receives 30s single-use JWT
+2. Client: WS /ws/terminal?ticket=<jwt>
+3. Server: validates JWT, marks jti as used (Redis SETNX), upgrades to WS
+4. After upgrade: connection authenticated for its lifetime
+```
+
+This prevents ticket replay and avoids passing long-lived tokens in URLs.
+
+## Chat Streaming (SSE, not WebSocket)
+
+AI chat uses **Server-Sent Events** instead of WebSocket because:
+- Unidirectional (server → client) matches the use case
+- Automatic reconnection via EventSource API
+- Works through CDNs and load balancers
+- Each message send is a discrete HTTP request
+
+```
+POST /chat/conversations/:id/message
+Accept: text/event-stream
+
+→ event: delta        {"content": "Here's "}
+→ event: delta        {"content": "the answer..."}
+→ event: tool_call    {"name": "shell_exec", "input": {...}}
+→ event: tool_result  {"output": "total 42\n..."}
+→ event: delta        {"content": "I can see your files..."}
+→ event: done         {"inputTokens": 1523, "outputTokens": 847, "costCents": 42}
+```
+
+**Cancellation:** Client drops SSE connection → API aborts AI request via AbortController → partial response saved to DB.
+
+## AI Memory Integration (Automatic Context)
+
+When a user sends a chat message, memory is automatically injected:
+
+```
+1. Embed user's message
+2. Retrieve top-5 relevant memory entries (similarity > 0.7)
+3. Inject into system prompt:
+
+<work_context>
+- [2h ago, VS Code] Editing pricing page component
+- [Yesterday, Chrome] Reading Fly.io Machines API docs
+</work_context>
+```
+
+The user never needs to explicitly "search memory" — the AI proactively has context.
+
+## Credit Ledger Pattern
+
+Credits use an append-only ledger for auditability:
+
+```
+credit_ledger (append-only): records every +/- transaction
+credit_balances (materialized): running total for fast reads
+
+Flow:
+1. Before AI call: check credit_balances >= estimated_cost
+2. After response: calculate actual cost from tokens
+3. Atomic transaction: INSERT into ledger + UPDATE balance
+4. If insufficient: return 402
+```
+
+## Async Job Queue (BullMQ)
+
+Background tasks via Redis-backed queues:
+
+| Queue                  | Priority | Description                     |
+|------------------------|----------|---------------------------------|
+| `memory:summarize`     | Low      | AI summary generation           |
+| `memory:embed`         | Normal   | Batch embedding generation      |
+| `machine:lifecycle`    | High     | Provision, start, stop, upgrade |
+| `automation:schedule`  | Normal   | Cron evaluation (every minute)  |
+| `backup:sync`          | Low      | Nightly R2 backup per user      |

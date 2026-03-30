@@ -194,7 +194,7 @@ create table memory_entries (
 
 create index memory_entries_user_time_idx on memory_entries (user_id, captured_at desc);
 create index memory_entries_embedding_idx on memory_entries
-  using ivfflat (embedding vector_cosine_ops) with (lists = 100);
+  using hnsw (embedding vector_cosine_ops) with (m = 16, ef_construction = 64);
 create index memory_entries_source_idx on memory_entries (user_id, source);
 
 -- Apps excluded from screen capture
@@ -251,6 +251,58 @@ create table credit_usage (
 );
 
 create index credit_usage_user_period_idx on credit_usage (user_id, created_at desc);
+
+-- =============================================================================
+-- Credit Ledger (append-only for auditability)
+-- =============================================================================
+
+create table credit_balances (
+  user_id         uuid primary key references profiles(id) on delete cascade,
+  balance_cents   bigint not null default 0,
+  lifetime_used   bigint not null default 0,
+  updated_at      timestamptz not null default now()
+);
+
+create table credit_ledger (
+  id              bigserial primary key,
+  user_id         uuid not null references profiles(id) on delete cascade,
+  delta_cents     bigint not null,                -- positive = add, negative = consume
+  reason          text not null,                  -- 'subscription_grant' | 'purchase' | 'ai_usage' | 'refund'
+  reference_id    text,                           -- message ID, stripe invoice ID, etc.
+  balance_after   bigint not null,
+  created_at      timestamptz not null default now()
+);
+
+create index credit_ledger_user_idx on credit_ledger (user_id, created_at desc);
+
+-- =============================================================================
+-- Automation Runs (execution history)
+-- =============================================================================
+
+create table automation_runs (
+  id              uuid primary key default uuid_generate_v4(),
+  automation_id   uuid not null references automations(id) on delete cascade,
+  started_at      timestamptz not null default now(),
+  finished_at     timestamptz,
+  exit_code       integer,
+  stdout_tail     text,                           -- last 10KB
+  stderr_tail     text,
+  trigger_payload jsonb                           -- incoming email/SMS/LINE data
+);
+
+create index automation_runs_idx on automation_runs (automation_id, started_at desc);
+
+-- =============================================================================
+-- Storage Usage Tracking (Cloudflare R2)
+-- =============================================================================
+
+create table storage_usage (
+  user_id         uuid primary key references profiles(id) on delete cascade,
+  bytes_used      bigint not null default 0,
+  file_count      bigint not null default 0,
+  quota_bytes     bigint not null default 107374182400,  -- 100GB
+  updated_at      timestamptz not null default now()
+);
 
 -- =============================================================================
 -- Row Level Security (RLS) Policies
@@ -315,6 +367,26 @@ create policy "Users can manage own notification channels"
 
 create policy "Users can view own credit usage"
   on credit_usage for select using (auth.uid() = user_id);
+
+alter table credit_balances enable row level security;
+alter table credit_ledger enable row level security;
+alter table automation_runs enable row level security;
+alter table storage_usage enable row level security;
+
+create policy "Users can view own credit balance"
+  on credit_balances for select using (auth.uid() = user_id);
+
+-- credit_ledger: users can read, only service role can insert
+create policy "Users can view own credit ledger"
+  on credit_ledger for select using (auth.uid() = user_id);
+
+create policy "Users can view own automation runs"
+  on automation_runs for select using (
+    auth.uid() = (select user_id from automations where id = automation_runs.automation_id)
+  );
+
+create policy "Users can view own storage usage"
+  on storage_usage for select using (auth.uid() = user_id);
 
 -- =============================================================================
 -- Functions
