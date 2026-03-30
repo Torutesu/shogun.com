@@ -236,6 +236,15 @@ export const api = {
     getDownloadUrl(path: string) {
       return request<{ url: string }>(`/api/files/download-url?path=${encodeURIComponent(path)}`);
     },
+    read(path: string) {
+      return request<{ content: string; encoding: string }>(`/api/files/read?path=${encodeURIComponent(path)}`);
+    },
+    write(path: string, content: string) {
+      return request<void>("/api/files/write", {
+        method: "POST",
+        body: JSON.stringify({ path, content }),
+      });
+    },
   },
 
   // -------------------------------------------------------------------------

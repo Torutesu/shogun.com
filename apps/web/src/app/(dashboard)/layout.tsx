@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
 import { api } from "@/lib/api";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Spinner } from "@/components/ui/loading";
+import { CommandPalette } from "@/components/ui/command-palette";
+import { useGlobalShortcuts } from "@/hooks/use-keyboard-shortcuts";
 import type { MachineStatus } from "@shogun/shared/types";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -13,6 +15,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const router = useRouter();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [machineStatus, setMachineStatus] = useState<MachineStatus>("sleeping");
+  const [paletteOpen, setPaletteOpen] = useState(false);
+
+  useGlobalShortcuts({
+    onCommandPalette: useCallback(() => setPaletteOpen((o) => !o), []),
+    onNewConversation: useCallback(() => {
+      api.chat.createConversation().then((c) => router.push(`/chat/${c.id}`)).catch(() => {});
+    }, [router]),
+    onToggleTerminal: useCallback(() => router.push("/terminal"), [router]),
+    onToggleMemory: useCallback(() => router.push("/memory"), [router]),
+  });
 
   useEffect(() => {
     if (!loading && !user) {
@@ -49,6 +61,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       >
         {children}
       </main>
+      <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
     </div>
   );
 }

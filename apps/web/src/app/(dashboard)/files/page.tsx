@@ -6,6 +6,7 @@ import type { FileEntry } from "@shogun/shared/types";
 import { api } from "@/lib/api";
 import { Header } from "@/components/layout/header";
 import { FileList } from "@/components/files/file-list";
+import { CodeEditor } from "@/components/files/code-editor";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/loading";
 
@@ -15,6 +16,10 @@ export default function FilesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
+
+  // Editor state
+  const [editingFile, setEditingFile] = useState<{ name: string; path: string; content: string } | null>(null);
+  const [editorLoading, setEditorLoading] = useState(false);
 
   const loadFiles = useCallback(async (dir: string) => {
     setLoading(true);
@@ -39,7 +44,36 @@ export default function FilesPage() {
     const entry = files.find((f) => f.name === name);
     if (entry?.type === "directory") {
       setPath(path === "/" ? `/${name}` : `${path}/${name}`);
+    } else if (entry?.type === "file") {
+      openFile(name);
     }
+  };
+
+  const openFile = async (name: string) => {
+    const filePath = path === "/" ? `/${name}` : `${path}/${name}`;
+    setEditorLoading(true);
+    try {
+      const { content } = await api.files.read(filePath);
+      setEditingFile({ name, path: filePath, content });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to read file");
+    } finally {
+      setEditorLoading(false);
+    }
+  };
+
+  const handleEditorSave = async (content: string) => {
+    if (!editingFile) return;
+    try {
+      await api.files.write(editingFile.path, content);
+      setEditingFile({ ...editingFile, content });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save file");
+    }
+  };
+
+  const closeEditor = () => {
+    setEditingFile(null);
   };
 
   const handleUpload = async () => {
@@ -103,6 +137,53 @@ export default function FilesPage() {
       setError(err instanceof Error ? err.message : "Delete failed");
     }
   };
+
+  // When editing a file, show the editor instead of the file list
+  if (editingFile) {
+    return (
+      <div className="flex h-full flex-col">
+        <Header title="Files" />
+
+        {error && (
+          <div className="mx-4 mt-2 rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-4 py-2 text-sm text-red-700 dark:text-red-300">
+            {error}
+            <button onClick={() => setError(null)} className="ml-2 font-medium underline">Dismiss</button>
+          </div>
+        )}
+
+        <div className="flex items-center gap-2 border-b border-light-border dark:border-dark-border px-4 py-2">
+          <button
+            onClick={closeEditor}
+            className="flex items-center gap-1.5 text-sm text-light-text-muted dark:text-dark-text-muted hover:text-gold transition-colors cursor-pointer"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+            Back to files
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-hidden">
+          <CodeEditor
+            content={editingFile.content}
+            filename={editingFile.name}
+            onSave={handleEditorSave}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (editorLoading) {
+    return (
+      <div className="flex h-full flex-col">
+        <Header title="Files" />
+        <div className="flex h-full items-center justify-center">
+          <Spinner />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-full flex-col">

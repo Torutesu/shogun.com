@@ -5,6 +5,7 @@ import { cn } from "@shogun/ui";
 import type { AIModel } from "@shogun/shared/types";
 import { MODEL_CONFIGS } from "@shogun/shared/constants";
 import { Dropdown, DropdownItem } from "@/components/ui/dropdown";
+import { NotificationCenter } from "@/components/ui/notification-center";
 
 interface HeaderProps {
   title: string;
@@ -76,6 +77,9 @@ export function Header({ title, showModelSelector, selectedModel, onModelChange 
           ))}
         </Dropdown>
       )}
+
+      {/* Notification bell */}
+      <NotificationCenter />
 
       {/* Language switcher */}
       <div className="flex items-center rounded-md border border-light-border dark:border-dark-border text-xs">

@@ -90,7 +90,33 @@ machineAuthed.route("/files", fileRoutes);
 machineAuthed.route("/services", serviceRoutes);
 machineAuthed.route("/automations", automationRoutes);
 
-// Mount sub-apps
+// ---------------------------------------------------------------------------
+// API Versioning
+// ---------------------------------------------------------------------------
+// All routes are mounted under /v1/ for forward-compatible versioning.
+// When v2 is introduced, create a separate Hono sub-app and mount at /v2.
+// Unversioned paths receive a deprecation warning header.
+// ---------------------------------------------------------------------------
+
+// Mount under /v1
+app.route("/v1", authed);
+app.route("/v1", machineAuthed);
+app.route("/v1/auth", authRoutes);
+app.route("/v1/billing/webhook", billingRoutes);
+
+// Deprecation middleware for unversioned paths — adds a warning header
+// so clients know to migrate to /v1/.
+app.use("*", async (c, next) => {
+  const path = c.req.path;
+  if (path !== "/" && !path.startsWith("/v1") && !path.startsWith("/auth") && !path.startsWith("/billing/webhook")) {
+    c.header("Deprecation", "true");
+    c.header("Sunset", "2027-01-01");
+    c.header("X-API-Warn", "Unversioned API paths are deprecated. Use /v1/ prefix.");
+  }
+  await next();
+});
+
+// Legacy unversioned mounts (keep working, but warn)
 app.route("/", authed);
 app.route("/", machineAuthed);
 
