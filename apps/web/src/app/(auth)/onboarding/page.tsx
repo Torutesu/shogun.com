@@ -91,7 +91,7 @@ export default function OnboardingPage() {
   }, [step]);
 
   const handleSubmitHandle = async () => {
-    if (handleError || handleChecking || !handle) return;
+    if (handleChecking || !handle || handle.length < 3) return;
     setStep("provisioning");
     setProvisionProgress(0);
   };
