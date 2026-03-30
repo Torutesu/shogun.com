@@ -37,13 +37,16 @@ const triggerLabels: Record<string, string> = {
 export default function AutomationsPage() {
   const [automations, setAutomations] = useState<Automation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [createName, setCreateName] = useState("");
   const [createTrigger, setCreateTrigger] = useState("cron");
   const [creating, setCreating] = useState(false);
 
   useEffect(() => {
-    api.automations.list().then(setAutomations).catch(() => {}).finally(() => setLoading(false));
+    api.automations.list().then(setAutomations).catch((err) => {
+      setError(err instanceof Error ? err.message : "Failed to load automations");
+    }).finally(() => setLoading(false));
   }, []);
 
   const handleCreate = useCallback(async () => {
@@ -57,8 +60,8 @@ export default function AutomationsPage() {
       ]);
       setShowCreate(false);
       setCreateName("");
-    } catch {
-      // ignore
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create automation");
     } finally {
       setCreating(false);
     }
@@ -69,7 +72,9 @@ export default function AutomationsPage() {
     try {
       await api.automations.update(id, { status: newStatus });
       setAutomations((prev) => prev.map((a) => (a.id === id ? { ...a, status: newStatus } : a)));
-    } catch { /* ignore */ }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update automation");
+    }
   }, []);
 
   const handleDelete = useCallback(async (id: string) => {
@@ -77,12 +82,21 @@ export default function AutomationsPage() {
     try {
       await api.automations.delete(id);
       setAutomations((prev) => prev.filter((a) => a.id !== id));
-    } catch { /* ignore */ }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete automation");
+    }
   }, []);
 
   return (
     <div className="flex h-full flex-col">
       <Header title="Automations" />
+
+      {error && (
+        <div className="mx-4 mt-2 rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-4 py-2 text-sm text-red-700 dark:text-red-300">
+          {error}
+          <button onClick={() => setError(null)} className="ml-2 font-medium underline">Dismiss</button>
+        </div>
+      )}
 
       <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4">
         <div className="mb-4 flex items-center justify-between">

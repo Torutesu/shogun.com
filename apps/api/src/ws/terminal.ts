@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { createServerClient } from "@shogun/db";
 import type { AuthVariables } from "../middleware/auth";
-import { randomBytes } from "node:crypto";
+import { randomBytes, createHash } from "node:crypto";
 
 const terminal = new Hono<{ Variables: AuthVariables }>();
 
@@ -14,6 +14,11 @@ interface Ticket {
   machineId: string;
   flyAppName: string;
   createdAt: number;
+  uaFingerprint: string;
+}
+
+function hashUserAgent(ua: string): string {
+  return createHash("sha256").update(ua).digest("hex");
 }
 
 const ticketStore = new Map<string, Ticket>();
@@ -57,12 +62,14 @@ terminal.post("/ticket", async (c) => {
     return c.json({ error: { code: "MACHINE_NOT_READY", message: "Machine is not fully provisioned", status: 409 } }, 409);
   }
 
+  const uaFingerprint = hashUserAgent(c.req.header("User-Agent") ?? "");
   const ticket = randomBytes(32).toString("hex");
   ticketStore.set(ticket, {
     userId,
     machineId: machine.fly_machine_id,
     flyAppName: machine.fly_app_name,
     createdAt: Date.now(),
+    uaFingerprint,
   });
 
   return c.json({ ticket, expires_in: 60 });
@@ -89,6 +96,12 @@ terminal.get("/ws", async (c) => {
   // Check ticket age (max 60 seconds)
   if (Date.now() - ticketData.createdAt > 60_000) {
     return c.json({ error: { code: "TICKET_EXPIRED", message: "Ticket has expired", status: 401 } }, 401);
+  }
+
+  // Validate user-agent fingerprint matches the ticket creator
+  const wsUaFingerprint = hashUserAgent(c.req.header("User-Agent") ?? "");
+  if (wsUaFingerprint !== ticketData.uaFingerprint) {
+    return c.json({ error: { code: "FINGERPRINT_MISMATCH", message: "User-agent mismatch", status: 401 } }, 401);
   }
 
   // Upgrade to WebSocket

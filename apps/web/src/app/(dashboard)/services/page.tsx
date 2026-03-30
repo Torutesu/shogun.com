@@ -28,13 +28,16 @@ const statusBadge: Record<string, "green" | "red" | "gold" | "default"> = {
 export default function ServicesPage() {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [showDeploy, setShowDeploy] = useState(false);
   const [deployName, setDeployName] = useState("");
   const [deployPort, setDeployPort] = useState("3000");
   const [deploying, setDeploying] = useState(false);
 
   useEffect(() => {
-    api.services.list().then(setServices).catch(() => {}).finally(() => setLoading(false));
+    api.services.list().then(setServices).catch((err) => {
+      setError(err instanceof Error ? err.message : "Failed to load services");
+    }).finally(() => setLoading(false));
   }, []);
 
   const handleDeploy = useCallback(async () => {
@@ -49,8 +52,8 @@ export default function ServicesPage() {
       setShowDeploy(false);
       setDeployName("");
       setDeployPort("3000");
-    } catch {
-      // ignore
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Deploy failed");
     } finally {
       setDeploying(false);
     }
@@ -60,7 +63,9 @@ export default function ServicesPage() {
     try {
       await api.services.stop(id);
       setServices((prev) => prev.map((s) => (s.id === id ? { ...s, status: "stopped" } : s)));
-    } catch { /* ignore */ }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to stop service");
+    }
   }, []);
 
   const handleDelete = useCallback(async (id: string) => {
@@ -68,12 +73,21 @@ export default function ServicesPage() {
     try {
       await api.services.delete(id);
       setServices((prev) => prev.filter((s) => s.id !== id));
-    } catch { /* ignore */ }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete service");
+    }
   }, []);
 
   return (
     <div className="flex h-full flex-col">
       <Header title="Services" />
+
+      {error && (
+        <div className="mx-4 mt-2 rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-4 py-2 text-sm text-red-700 dark:text-red-300">
+          {error}
+          <button onClick={() => setError(null)} className="ml-2 font-medium underline">Dismiss</button>
+        </div>
+      )}
 
       <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4">
         <div className="mb-4 flex items-center justify-between">

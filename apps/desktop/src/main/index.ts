@@ -70,7 +70,7 @@ function createWindow(): void {
 
   mainWindow.on("close", (e) => {
     // Prevent closing; hide to tray instead
-    if (mainWindow && !app.isQuitting) {
+    if (mainWindow && !isQuitting) {
       e.preventDefault();
       mainWindow.hide();
     }
@@ -216,12 +216,8 @@ function setupEventForwarding(): void {
 // App Lifecycle
 // ---------------------------------------------------------------------------
 
-// Extend app with custom property for clean quit
-declare module "electron" {
-  interface App {
-    isQuitting?: boolean;
-  }
-}
+// Track quit state
+let isQuitting = false;
 
 app.on("ready", async () => {
   try {
@@ -291,7 +287,7 @@ app.on("second-instance", () => {
 });
 
 app.on("before-quit", async () => {
-  app.isQuitting = true;
+  isQuitting = true;
 
   try {
     await captureService.destroy();

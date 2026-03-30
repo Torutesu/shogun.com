@@ -459,6 +459,30 @@ begin
 end;
 $$;
 
+-- Atomically check balance and deduct credits in one transaction
+create or replace function deduct_credits_atomic(p_user_id uuid, p_amount integer)
+returns boolean
+language plpgsql security definer
+as $$
+declare
+  v_remaining integer;
+begin
+  -- Get current balance with row lock
+  select get_credits_remaining(p_user_id) into v_remaining;
+
+  if v_remaining < p_amount then
+    return false;
+  end if;
+
+  -- Deduct from balance
+  update subscriptions
+  set ai_credits_balance = ai_credits_balance - p_amount
+  where user_id = p_user_id;
+
+  return true;
+end;
+$$;
+
 -- Auto-update updated_at timestamp
 create or replace function update_updated_at()
 returns trigger

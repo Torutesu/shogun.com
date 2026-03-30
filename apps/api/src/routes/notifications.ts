@@ -3,9 +3,33 @@ import { zValidator } from "@hono/zod-validator";
 import { addChannelSchema } from "@shogun/shared";
 import { createServerClient } from "@shogun/db";
 import type { AuthVariables } from "../middleware/auth";
-import { randomInt } from "node:crypto";
+import { randomBytes } from "node:crypto";
 
 const notifications = new Hono<{ Variables: AuthVariables }>();
+
+// ---------------------------------------------------------------------------
+// Brute-force protection for verification attempts
+// ---------------------------------------------------------------------------
+
+interface VerifyAttempt {
+  count: number;
+  firstAttemptAt: number;
+}
+
+const verifyAttempts = new Map<string, VerifyAttempt>();
+
+// Clean up expired entries every 5 minutes
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, entry] of verifyAttempts) {
+    if (now - entry.firstAttemptAt > 10 * 60 * 1000) {
+      verifyAttempts.delete(key);
+    }
+  }
+}, 5 * 60 * 1000);
+
+const MAX_VERIFY_ATTEMPTS = 5;
+const VERIFY_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
 
 // ---------------------------------------------------------------------------
 // GET /channels - list notification channels
@@ -35,8 +59,8 @@ notifications.post("/channels", zValidator("json", addChannelSchema), async (c) 
   const { channel, identifier } = c.req.valid("json");
   const supabase = createServerClient();
 
-  // Generate verification code
-  const verificationCode = String(randomInt(100000, 999999));
+  // Generate verification code (8 hex chars for brute-force resistance)
+  const verificationCode = randomBytes(4).toString("hex");
 
   const { data, error } = await supabase
     .from("notification_channels")
@@ -64,7 +88,7 @@ notifications.post("/channels", zValidator("json", addChannelSchema), async (c) 
   // Send verification code via the appropriate channel
   // TODO: integrate with actual SMS/email/LINE services
   // For now, the code is stored and can be retrieved for testing
-  console.log(`[notifications] Verification code for ${channel}:${identifier}: ${verificationCode}`);
+  console.log(`[notifications] Verification code sent for ${channel}:${identifier}`);
 
   return c.json({ channel: data }, 201);
 });
@@ -109,6 +133,22 @@ notifications.post("/channels/:id/verify", async (c) => {
     return c.json({ error: { code: "MISSING_CODE", message: "Verification code is required", status: 400 } }, 400);
   }
 
+  // Brute-force protection: max attempts per channel ID
+  const attemptKey = `${userId}:${id}`;
+  const attempt = verifyAttempts.get(attemptKey);
+  const now = Date.now();
+  if (attempt) {
+    if (now - attempt.firstAttemptAt > VERIFY_WINDOW_MS) {
+      // Window expired, reset
+      verifyAttempts.delete(attemptKey);
+    } else if (attempt.count >= MAX_VERIFY_ATTEMPTS) {
+      return c.json(
+        { error: { code: "TOO_MANY_ATTEMPTS", message: "Too many verification attempts. Try again later.", status: 429 } },
+        429,
+      );
+    }
+  }
+
   const { data: channel, error } = await supabase
     .from("notification_channels")
     .select("*")
@@ -129,9 +169,20 @@ notifications.post("/channels/:id/verify", async (c) => {
     return c.json({ error: { code: "CODE_EXPIRED", message: "Verification code has expired. Request a new one.", status: 410 } }, 410);
   }
 
+  // Track verification attempt
+  const currentAttempt = verifyAttempts.get(attemptKey);
+  if (currentAttempt) {
+    currentAttempt.count++;
+  } else {
+    verifyAttempts.set(attemptKey, { count: 1, firstAttemptAt: Date.now() });
+  }
+
   if (channel.verification_code !== body.code) {
     return c.json({ error: { code: "INVALID_CODE", message: "Incorrect verification code", status: 400 } }, 400);
   }
+
+  // Clear attempts on success
+  verifyAttempts.delete(attemptKey);
 
   await supabase
     .from("notification_channels")

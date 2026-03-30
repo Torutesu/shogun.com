@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"runtime/debug"
@@ -9,6 +10,10 @@ import (
 	"github.com/shogun/agent/auth"
 	"github.com/shogun/agent/config"
 )
+
+type errorResponse struct {
+	Error string `json:"error"`
+}
 
 // responseWriter wraps http.ResponseWriter to capture the status code.
 type responseWriter struct {
@@ -36,7 +41,8 @@ func Auth(cfg *config.Config) func(http.Handler) http.Handler {
 			if err != nil {
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusUnauthorized)
-				w.Write([]byte(`{"error":"unauthorized: ` + err.Error() + `"}`))
+				resp, _ := json.Marshal(errorResponse{Error: "unauthorized: " + err.Error()})
+				w.Write(resp)
 				return
 			}
 

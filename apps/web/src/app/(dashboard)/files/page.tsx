@@ -13,6 +13,7 @@ export default function FilesPage() {
   const [path, setPath] = useState("/");
   const [files, setFiles] = useState<FileEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
 
   const loadFiles = useCallback(async (dir: string) => {
@@ -20,7 +21,8 @@ export default function FilesPage() {
     try {
       const entries = await api.files.list(dir);
       setFiles(entries);
-    } catch {
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load files");
       setFiles([]);
     } finally {
       setLoading(false);
@@ -51,8 +53,8 @@ export default function FilesPage() {
         const { url } = await api.files.getUploadUrl(filePath);
         await fetch(url, { method: "PUT", body: file });
         loadFiles(path);
-      } catch {
-        // ignore
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Upload failed");
       }
     };
     input.click();
@@ -65,8 +67,8 @@ export default function FilesPage() {
       const folderPath = path === "/" ? `/${name}` : `${path}/${name}`;
       await api.files.createFolder(folderPath);
       loadFiles(path);
-    } catch {
-      // ignore
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create folder");
     }
   };
 
@@ -76,8 +78,8 @@ export default function FilesPage() {
     try {
       await api.files.rename(oldPath, newPath);
       loadFiles(path);
-    } catch {
-      // ignore
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Rename failed");
     }
   };
 
@@ -86,8 +88,8 @@ export default function FilesPage() {
     try {
       const { url } = await api.files.getDownloadUrl(filePath);
       window.open(url, "_blank");
-    } catch {
-      // ignore
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Download failed");
     }
   };
 
@@ -97,14 +99,21 @@ export default function FilesPage() {
     try {
       await api.files.delete(filePath);
       loadFiles(path);
-    } catch {
-      // ignore
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Delete failed");
     }
   };
 
   return (
     <div className="flex h-full flex-col">
       <Header title="Files" />
+
+      {error && (
+        <div className="mx-4 mt-2 rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-4 py-2 text-sm text-red-700 dark:text-red-300">
+          {error}
+          <button onClick={() => setError(null)} className="ml-2 font-medium underline">Dismiss</button>
+        </div>
+      )}
 
       <div className="flex items-center gap-2 border-b border-light-border dark:border-dark-border px-4 py-2">
         {/* Breadcrumbs */}

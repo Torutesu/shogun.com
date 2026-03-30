@@ -2,10 +2,12 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"os/exec"
+	"regexp"
 	"sync"
 	"syscall"
 	"time"
@@ -13,6 +15,8 @@ import (
 	"github.com/creack/pty"
 	"github.com/gorilla/websocket"
 )
+
+var validSessionID = regexp.MustCompile(`^[a-zA-Z0-9\-]{1,64}$`)
 
 var upgrader = websocket.Upgrader{
 	CheckOrigin: func(r *http.Request) bool {
@@ -158,6 +162,10 @@ func PTYHandler(activity *Activity) http.HandlerFunc {
 		if sessionID == "" {
 			sessionID = "default"
 		}
+		if !validSessionID.MatchString(sessionID) {
+			http.Error(w, fmt.Sprintf(`{"error":"invalid session_id: must be alphanumeric/hyphens, max 64 chars"}`), http.StatusBadRequest)
+			return
+		}
 
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
@@ -165,6 +173,14 @@ func PTYHandler(activity *Activity) http.HandlerFunc {
 			return
 		}
 		defer conn.Close()
+
+		// Set read deadline and extend it on pong messages.
+		const wsTimeout = 60 * time.Second
+		conn.SetReadDeadline(time.Now().Add(wsTimeout))
+		conn.SetPongHandler(func(string) error {
+			conn.SetReadDeadline(time.Now().Add(wsTimeout))
+			return nil
+		})
 
 		sess, err := globalPTYManager.getOrCreate(sessionID)
 		if err != nil {
@@ -205,6 +221,22 @@ func PTYHandler(activity *Activity) http.HandlerFunc {
 			}
 		}()
 
+		// Ping ticker to keep the connection alive.
+		pingTicker := time.NewTicker(30 * time.Second)
+		defer pingTicker.Stop()
+		go func() {
+			for {
+				select {
+				case <-stopReader:
+					return
+				case <-pingTicker.C:
+					if err := conn.WriteControl(websocket.PingMessage, nil, time.Now().Add(10*time.Second)); err != nil {
+						return
+					}
+				}
+			}
+		}()
+
 		// Main loop: read from WebSocket client, write to PTY.
 		for {
 			_, message, err := conn.ReadMessage()
@@ -213,6 +245,9 @@ func PTYHandler(activity *Activity) http.HandlerFunc {
 				close(stopReader)
 				return
 			}
+
+			// Extend read deadline on each received message.
+			conn.SetReadDeadline(time.Now().Add(wsTimeout))
 
 			sess.mu.Lock()
 			sess.lastActivity = time.Now()

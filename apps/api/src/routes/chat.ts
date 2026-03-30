@@ -15,6 +15,7 @@ import { createAIClient, TOOL_DEFINITIONS } from "@shogun/ai";
 import { MemoryService } from "@shogun/memory";
 import type { AuthVariables } from "../middleware/auth";
 import { getEnv } from "../lib/env";
+import { decrypt } from "./keys";
 
 const chat = new Hono<{ Variables: AuthVariables }>();
 
@@ -38,7 +39,8 @@ async function getUserApiKey(supabase: ReturnType<typeof createServerClient>, us
     .eq("user_id", userId)
     .eq("provider", provider)
     .single();
-  return data?.encrypted_key ?? null;
+  if (!data?.encrypted_key) return null;
+  return decrypt(data.encrypted_key);
 }
 
 function calculateCost(model: AIModel, inputTokens: number, outputTokens: number): number {
@@ -47,6 +49,9 @@ function calculateCost(model: AIModel, inputTokens: number, outputTokens: number
 }
 
 async function callAgent(machineId: string, path: string, method: string, body?: unknown): Promise<unknown> {
+  if (!/^[a-z0-9-]+$/.test(machineId)) {
+    throw new Error("Invalid machine ID format");
+  }
   // TODO: resolve actual Fly internal address once container agent is built
   const agentUrl = `http://${machineId}.vm.flycast:8080${path}`;
   const res = await fetch(agentUrl, {
@@ -67,10 +72,19 @@ async function executeToolCall(
   switch (toolName) {
     case "shell_exec": {
       if (!machineId) return JSON.stringify({ error: "No machine available" });
+      const command = String(input.command ?? "");
+      if (command.length > 10000) {
+        return JSON.stringify({ error: "Command exceeds maximum length of 10000 characters" });
+      }
+      const timeoutMs = input.timeout_ms != null ? Math.min(Math.max(Number(input.timeout_ms), 100), 300000) : undefined;
+      const workingDir = input.working_directory != null ? String(input.working_directory) : undefined;
+      if (workingDir && !/^\/[\w./ -]*$/.test(workingDir)) {
+        return JSON.stringify({ error: "Invalid working directory format" });
+      }
       const result = await callAgent(machineId, "/exec", "POST", {
-        command: input.command,
-        working_directory: input.working_directory,
-        timeout_ms: input.timeout_ms,
+        command,
+        working_directory: workingDir,
+        timeout_ms: timeoutMs,
       });
       return JSON.stringify(result);
     }
@@ -451,6 +465,7 @@ chat.post("/conversations/:id/message", zValidator("json", sendMessageSchema), a
                   event: "tool_result",
                 });
               } catch (err) {
+                console.error(`[chat] Tool execution failed: tool=${event.name} userId=${userId}`, err);
                 const errorMsg = err instanceof Error ? err.message : "Tool execution failed";
                 const toolResult: ToolResult = { toolCallId: toolCall.id, output: errorMsg, isError: true };
                 allToolResults.push(toolResult);
@@ -493,12 +508,18 @@ chat.post("/conversations/:id/message", zValidator("json", sendMessageSchema), a
         cost_cents: costCents,
       });
 
-      // 10. Deduct credits if not BYOK
+      // 10. Deduct credits atomically if not BYOK
       if (!isByok && costCents > 0) {
-        await supabase.rpc("deduct_credits" as any, {
+        const { data: deducted, error: deductError } = await supabase.rpc("deduct_credits_atomic" as any, {
           p_user_id: userId,
           p_amount: costCents,
         });
+        if (deductError || deducted === false) {
+          // Message was already sent, so log the overdraft rather than blocking
+          console.error(
+            `[chat] Atomic credit deduction failed: userId=${userId} cost=${costCents} error=${deductError?.message ?? "insufficient balance"}`,
+          );
+        }
       }
 
       // Update conversation updated_at

@@ -160,9 +160,13 @@ files.get("/download", async (c) => {
     }
 
     const blob = await res.blob();
-    const filename = path.split("/").pop() ?? "download";
+    const rawFilename = path.split("/").pop() ?? "download";
+    // Sanitize: only allow safe ASCII chars, replace everything else
+    const safeFilename = rawFilename.replace(/[^a-zA-Z0-9._-]/g, "_") || "download";
+    // RFC 5987 encoded filename for non-ASCII support
+    const encodedFilename = encodeURIComponent(rawFilename).replace(/'/g, "%27");
 
-    c.header("Content-Disposition", `attachment; filename="${filename}"`);
+    c.header("Content-Disposition", `attachment; filename="${safeFilename}"; filename*=UTF-8''${encodedFilename}`);
     c.header("Content-Type", res.headers.get("Content-Type") ?? "application/octet-stream");
     return c.body(await blob.arrayBuffer());
   } catch (err) {

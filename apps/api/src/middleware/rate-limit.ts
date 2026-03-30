@@ -1,5 +1,6 @@
 import { createMiddleware } from "hono/factory";
 import { TIER_CONFIGS, type SubscriptionTier } from "@shogun/shared";
+import { createServerClient } from "@shogun/db";
 import type { AuthVariables } from "./auth";
 
 interface RateLimitEntry {
@@ -26,7 +27,21 @@ export const rateLimitMiddleware = createMiddleware<{ Variables: AuthVariables &
       return await next();
     }
 
-    const tier = c.get("tier") ?? "free";
+    let tier: SubscriptionTier = c.get("tier") ?? ("" as SubscriptionTier);
+    if (!tier) {
+      try {
+        const supabase = createServerClient();
+        const { data } = await supabase
+          .from("subscriptions")
+          .select("tier")
+          .eq("user_id", userId)
+          .single();
+        tier = (data?.tier as SubscriptionTier) ?? "free";
+        c.set("tier", tier);
+      } catch {
+        tier = "free";
+      }
+    }
     const config = TIER_CONFIGS[tier];
     const limit = config.rateLimitPerMin;
 

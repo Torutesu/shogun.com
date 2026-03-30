@@ -77,7 +77,7 @@ async function getActiveWindow(): Promise<ActiveWindowInfo> {
 
     // For non-Electron windows we attempt platform-specific detection.
     // This uses child_process to query the OS.
-    const { execSync } = await import("node:child_process");
+    const { execFileSync } = await import("node:child_process");
     const platform = process.platform;
 
     if (platform === "darwin") {
@@ -92,7 +92,7 @@ async function getActiveWindow(): Promise<ActiveWindowInfo> {
           return appName & "|" & winTitle
         end tell
       `;
-      const result = execSync(`osascript -e '${script}'`, {
+      const result = execFileSync("osascript", ["-e", script], {
         encoding: "utf-8",
         timeout: 3000,
       }).trim();
@@ -117,7 +117,7 @@ async function getActiveWindow(): Promise<ActiveWindowInfo> {
         $proc = Get-Process -Id $pid -ErrorAction SilentlyContinue
         "$($proc.ProcessName)|$($proc.MainWindowTitle)"
       `;
-      const result = execSync(`powershell -NoProfile -Command "${ps}"`, {
+      const result = execFileSync("powershell", ["-NoProfile", "-Command", ps], {
         encoding: "utf-8",
         timeout: 3000,
       }).trim();
@@ -128,22 +128,22 @@ async function getActiveWindow(): Promise<ActiveWindowInfo> {
     if (platform === "linux") {
       // xdotool approach
       try {
-        const windowId = execSync("xdotool getactivewindow", {
+        const windowId = execFileSync("xdotool", ["getactivewindow"], {
           encoding: "utf-8",
           timeout: 2000,
         }).trim();
-        const title = execSync(`xdotool getactivewindow getwindowname`, {
+        const title = execFileSync("xdotool", ["getactivewindow", "getwindowname"], {
           encoding: "utf-8",
           timeout: 2000,
         }).trim();
-        const pid = execSync(
-          `xdotool getactivewindow getwindowpid`,
+        const pid = execFileSync(
+          "xdotool", ["getactivewindow", "getwindowpid"],
           { encoding: "utf-8", timeout: 2000 },
         ).trim();
-        const appName = execSync(
-          `ps -p ${pid} -o comm= 2>/dev/null || echo Unknown`,
+        const appName = execFileSync(
+          "ps", ["-p", pid, "-o", "comm="],
           { encoding: "utf-8", timeout: 2000 },
-        ).trim();
+        ).trim() || "Unknown";
         return { appName, title };
       } catch {
         return { appName: "Unknown", title: "" };

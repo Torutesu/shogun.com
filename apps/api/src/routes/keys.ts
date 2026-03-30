@@ -15,7 +15,11 @@ const keys = new Hono<{ Variables: AuthVariables }>();
 
 function getEncryptionKey(): Buffer {
   const env = getEnv();
-  return Buffer.from(env.ENCRYPTION_KEY, "hex").subarray(0, 32);
+  const key = Buffer.from(env.ENCRYPTION_KEY, "hex");
+  if (key.length !== 32) {
+    throw new Error(`ENCRYPTION_KEY must be exactly 32 bytes (64 hex chars), got ${key.length} bytes`);
+  }
+  return key;
 }
 
 function encrypt(plaintext: string): string {
@@ -26,7 +30,7 @@ function encrypt(plaintext: string): string {
   return iv.toString("hex") + ":" + encrypted.toString("hex");
 }
 
-function decrypt(ciphertext: string): string {
+export function decrypt(ciphertext: string): string {
   const key = getEncryptionKey();
   const [ivHex = "", encHex = ""] = ciphertext.split(":");
   const iv = Buffer.from(ivHex, "hex");

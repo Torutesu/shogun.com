@@ -23,6 +23,8 @@ export interface TranscriptionState {
 // ---------------------------------------------------------------------------
 
 const CHUNK_DURATION_MS = 30_000; // 30 seconds
+const MAX_TRANSCRIPT_BYTES = 500 * 1024; // 500KB
+const TRIM_TRANSCRIPT_BYTES = 400 * 1024; // Keep last 400KB when trimming
 
 class TranscriptionService extends EventEmitter {
   private _recording = false;
@@ -191,6 +193,10 @@ class TranscriptionService extends EventEmitter {
       const result = (await response.json()) as { text?: string };
       if (result.text && result.text.trim().length > 0) {
         this.fullTranscript += (this.fullTranscript ? " " : "") + result.text.trim();
+        // Prevent unbounded growth for long meetings
+        if (this.fullTranscript.length > MAX_TRANSCRIPT_BYTES) {
+          this.fullTranscript = this.fullTranscript.slice(-TRIM_TRANSCRIPT_BYTES);
+        }
         this.emitState();
       }
     } catch (err) {

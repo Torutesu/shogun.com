@@ -26,22 +26,25 @@ func safePath(raw string) (string, error) {
 		cleaned = filepath.Join(basePath, cleaned)
 	}
 
-	// Resolve symlinks on the parent to prevent traversal via symlink.
-	parent := filepath.Dir(cleaned)
-	resolved, err := filepath.EvalSymlinks(parent)
+	abs, err := filepath.Abs(cleaned)
 	if err != nil {
-		// Parent may not exist yet (e.g., mkdir -p). Fall back to lexical check.
-		if !strings.HasPrefix(cleaned, basePath) {
-			return "", fmt.Errorf("path must be under %s", basePath)
-		}
-		return cleaned, nil
+		return "", fmt.Errorf("invalid path")
 	}
 
-	full := filepath.Join(resolved, filepath.Base(cleaned))
-	if !strings.HasPrefix(full, basePath) {
+	// Lexical prefix check on the cleaned absolute path.
+	if !strings.HasPrefix(abs+"/", basePath+"/") && abs != basePath {
 		return "", fmt.Errorf("path must be under %s", basePath)
 	}
-	return full, nil
+
+	// Also check resolved symlinks if the path exists.
+	if _, err := os.Lstat(abs); err == nil {
+		resolved, err := filepath.EvalSymlinks(abs)
+		if err == nil && !strings.HasPrefix(resolved+"/", basePath+"/") && resolved != basePath {
+			return "", fmt.Errorf("symlink target must be under %s", basePath)
+		}
+	}
+
+	return abs, nil
 }
 
 func writeJSON(w http.ResponseWriter, status int, v interface{}) {

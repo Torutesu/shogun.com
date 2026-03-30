@@ -113,7 +113,6 @@ function buildContextMenu(): Electron.Menu {
     {
       label: "Quit SHOGUN",
       click: () => {
-        app.isQuitting = true;
         app.quit();
       },
     },

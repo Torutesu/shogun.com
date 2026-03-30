@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@shogun/ui";
 import type { AIModel } from "@shogun/shared/types";
 import { MODEL_CONFIGS } from "@shogun/shared/constants";
@@ -21,12 +21,20 @@ const locales = [
 
 export function Header({ title, showModelSelector, selectedModel, onModelChange }: HeaderProps) {
   const [locale, setLocale] = useState<string>("en");
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [theme, setTheme] = useState<"light" | "dark">(() => {
+    if (typeof window !== "undefined") {
+      return (localStorage.getItem("shogun_theme") as "light" | "dark") ?? "light";
+    }
+    return "light";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("shogun_theme", theme);
+    document.documentElement.classList.toggle("dark", theme === "dark");
+  }, [theme]);
 
   const toggleTheme = () => {
-    const next = theme === "light" ? "dark" : "light";
-    setTheme(next);
-    document.documentElement.classList.toggle("dark", next === "dark");
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
   };
 
   return (

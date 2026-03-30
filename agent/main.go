@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
@@ -16,7 +17,7 @@ func main() {
 		log.Fatalf("config error: %v", err)
 	}
 
-	activity := handlers.NewActivity(cfg)
+	activity := handlers.NewActivity(context.Background(), cfg)
 
 	mux := http.NewServeMux()
 
