@@ -58,7 +58,7 @@ export default function AuditPage() {
       .list()
       .then((teams) => {
         if (teams.length === 0) return;
-        setTeamId(teams[0].id);
+        if (teams[0]) setTeamId(teams[0].id);
       })
       .catch(() => {})
       .finally(() => setLoading(false));

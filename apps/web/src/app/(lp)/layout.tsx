@@ -1,26 +1,4 @@
 import type { Metadata } from "next";
-import { Bebas_Neue, DM_Sans, DM_Mono } from "next/font/google";
-
-const bebasNeue = Bebas_Neue({
-  weight: "400",
-  subsets: ["latin"],
-  variable: "--font-display",
-  display: "swap",
-});
-
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
-  variable: "--font-body",
-  display: "swap",
-});
-
-const dmMono = DM_Mono({
-  subsets: ["latin"],
-  weight: ["300", "400"],
-  variable: "--font-mono",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "SHOGUN — The only AI that knows your work",
@@ -38,10 +16,14 @@ export const metadata: Metadata = {
 
 export default function LPLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div
-      className={`${bebasNeue.variable} ${dmSans.variable} ${dmMono.variable}`}
-    >
-      {children}
-    </div>
+    <>
+      {/* Load fonts via link tags — gracefully degrades if unavailable */}
+      {/* eslint-disable-next-line @next/next/no-page-custom-font */}
+      <link
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400&family=DM+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet"
+      />
+      <div>{children}</div>
+    </>
   );
 }

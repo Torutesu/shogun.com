@@ -49,7 +49,7 @@ export default function TeamPage() {
       .list()
       .then((data) => {
         setTeams(data);
-        if (data.length > 0) setSelectedTeam(data[0]);
+        if (data[0]) setSelectedTeam(data[0]);
       })
       .catch(() => {})
       .finally(() => setLoading(false));

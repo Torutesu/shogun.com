@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { createSupabaseBrowser } from "@/lib/supabase";
 import { api } from "@/lib/api";
 import type { UserProfile } from "@shogun/shared/types";
@@ -19,9 +19,13 @@ export function useAuth() {
     loading: true,
   });
 
-  const supabase = createSupabaseBrowser();
+  const supabase = useMemo(() => createSupabaseBrowser(), []);
 
   const fetchUser = useCallback(async () => {
+    if (!supabase) {
+      setState({ user: null, session: null, loading: false });
+      return;
+    }
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
@@ -39,6 +43,11 @@ export function useAuth() {
   }, [supabase]);
 
   useEffect(() => {
+    if (!supabase) {
+      setState({ user: null, session: null, loading: false });
+      return;
+    }
+
     fetchUser();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -63,6 +72,7 @@ export function useAuth() {
 
   const login = useCallback(
     async (email: string, password: string) => {
+      if (!supabase) throw new Error("Supabase not configured");
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
     },
@@ -71,6 +81,7 @@ export function useAuth() {
 
   const signup = useCallback(
     async (email: string, password: string) => {
+      if (!supabase) throw new Error("Supabase not configured");
       const { error } = await supabase.auth.signUp({ email, password });
       if (error) throw error;
     },
@@ -78,6 +89,7 @@ export function useAuth() {
   );
 
   const loginWithGoogle = useCallback(async () => {
+    if (!supabase) throw new Error("Supabase not configured");
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: `${window.location.origin}/onboarding` },
@@ -87,7 +99,7 @@ export function useAuth() {
 
   const logout = useCallback(async () => {
     localStorage.removeItem("shogun_token");
-    await supabase.auth.signOut();
+    if (supabase) await supabase.auth.signOut();
     setState({ user: null, session: null, loading: false });
   }, [supabase]);
 

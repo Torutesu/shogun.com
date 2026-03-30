@@ -62,7 +62,8 @@ export default function MembersPage() {
       .list()
       .then((teams) => {
         if (teams.length === 0) return;
-        const id = teams[0].id;
+        const id = teams[0]?.id;
+        if (!id) return;
         setTeamId(id);
         return Promise.all([
           api.teams.getMembers(id),

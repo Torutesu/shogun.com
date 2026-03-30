@@ -4,8 +4,8 @@
   "private": true,
   "main": "dist/main/index.js",
   "scripts": {
-    "dev": "electron-vite dev",
-    "build": "electron-vite build",
+    "dev": "tsup src/main/index.ts --watch --format esm --external electron --external electron-updater --external electron-store --external better-sqlite3",
+    "build": "tsup src/main/index.ts src/preload/index.ts --format esm --dts --external electron --external electron-updater --external electron-store --external better-sqlite3 --external tesseract.js",
     "lint": "eslint src/",
     "type-check": "tsc --noEmit"
   },
@@ -20,7 +20,7 @@
     "@types/better-sqlite3": "^7.6.12",
     "@types/node": "^22.0.0",
     "electron": "^34.0.0",
-    "electron-vite": "^3.0.0",
+    "tsup": "^8.4.0",
     "typescript": "^5.7.0"
   }
 }

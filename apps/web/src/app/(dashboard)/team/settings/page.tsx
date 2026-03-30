@@ -43,6 +43,7 @@ export default function TeamSettingsPage() {
       .then((teams) => {
         if (teams.length === 0) return;
         const team = teams[0];
+        if (!team) return;
         setTeamId(team.id);
         setTeamName(team.name);
         setTeamSlug(team.slug);

@@ -49,7 +49,7 @@ function detectLanguage(filename: string): string {
   if (lower === "dockerfile") return "Dockerfile";
   if (lower === "makefile") return "Makefile";
   const ext = lower.split(".").pop() ?? "";
-  return EXT_TO_LANG[ext] ?? ext.toUpperCase() || "Text";
+  return EXT_TO_LANG[ext] ?? (ext.toUpperCase() || "Text");
 }
 
 function isBinaryFile(filename: string): boolean {

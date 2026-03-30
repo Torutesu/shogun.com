@@ -2,6 +2,7 @@
 // SHOGUN Web — Sentry Error Monitoring (lightweight, optional)
 // =============================================================================
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let sentryClient: any = null;
 
 /**
@@ -13,13 +14,12 @@ export async function initSentry(): Promise<void> {
   if (!dsn) return;
 
   try {
-    const Sentry = await import("@sentry/nextjs");
+    // Dynamic import — gracefully fails if @sentry/nextjs is not installed
+    const Sentry = await (Function('return import("@sentry/nextjs")')() as Promise<any>);
     Sentry.init({
       dsn,
       environment: process.env.NODE_ENV ?? "development",
       tracesSampleRate: process.env.NODE_ENV === "production" ? 0.1 : 1.0,
-      // Capture unhandled errors and promise rejections
-      autoSessionTracking: true,
     });
     sentryClient = Sentry;
   } catch {
