@@ -8,25 +8,27 @@ import (
 	"os/exec"
 	"syscall"
 	"time"
+
+	"github.com/shogun/agent/config"
 )
 
-// ExecRequest is the JSON body for command execution.
+// ExecRequest is the JSON body for POST /exec.
 type ExecRequest struct {
 	Command string `json:"command"`
-	Timeout int    `json:"timeout,omitempty"` // seconds, 0 = use default
+	Timeout int    `json:"timeout,omitempty"` // seconds; 0 means use default
 }
 
-// ExecResponse is the JSON response from command execution.
+// ExecResponse is the JSON response from POST /exec.
 type ExecResponse struct {
 	Stdout   string `json:"stdout"`
 	Stderr   string `json:"stderr"`
 	ExitCode int    `json:"exit_code"`
 }
 
-// ExecHandler handles POST /exec for shell command execution.
-func ExecHandler(tracker *ActivityTracker, defaultTimeout int) http.HandlerFunc {
+// ExecHandler handles POST /exec — runs a shell command with timeout.
+func ExecHandler(cfg *config.Config, activity *Activity) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		tracker.Touch()
+		activity.Touch()
 
 		var req ExecRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -39,11 +41,11 @@ func ExecHandler(tracker *ActivityTracker, defaultTimeout int) http.HandlerFunc 
 			return
 		}
 
-		timeout := defaultTimeout
+		timeout := cfg.ExecTimeoutSeconds
 		if req.Timeout > 0 {
 			timeout = req.Timeout
 		}
-		// Cap at 5 minutes
+		// Cap at 5 minutes.
 		if timeout > 300 {
 			timeout = 300
 		}
@@ -52,9 +54,9 @@ func ExecHandler(tracker *ActivityTracker, defaultTimeout int) http.HandlerFunc 
 		defer cancel()
 
 		cmd := exec.CommandContext(ctx, "/bin/sh", "-c", req.Command)
-		cmd.Dir = "/home/user"
+		cmd.Dir = basePath
 
-		// Run as the container user (UID 1000), not root
+		// Run as the container user (UID/GID 1000), not root.
 		cmd.SysProcAttr = &syscall.SysProcAttr{
 			Credential: &syscall.Credential{
 				Uid: 1000,
@@ -73,14 +75,10 @@ func ExecHandler(tracker *ActivityTracker, defaultTimeout int) http.HandlerFunc 
 			if exitErr, ok := err.(*exec.ExitError); ok {
 				exitCode = exitErr.ExitCode()
 			} else if ctx.Err() == context.DeadlineExceeded {
-				writeJSON(w, http.StatusRequestTimeout, ExecResponse{
-					Stdout:   stdout.String(),
-					Stderr:   stderr.String() + "\n[timeout: command exceeded " + time.Duration(timeout).String() + "s limit]",
-					ExitCode: 124, // Convention: 124 = timeout
-				})
+				writeError(w, http.StatusRequestTimeout, "command timed out")
 				return
 			} else {
-				exitCode = 1
+				exitCode = -1
 			}
 		}
 
