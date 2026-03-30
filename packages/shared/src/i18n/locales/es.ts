@@ -118,6 +118,74 @@ const es: Record<keyof typeof en, string> = {
   "privacy.deleteAnytime": "Elimina lo que sea, cuando sea",
   "privacy.excludeApps": "Excluye cualquier app de la captura",
   "privacy.youOwnIt": "Tus datos son tuyos. Siempre.",
+  "privacy.body": "Tu memoria de trabajo es tuya. Construimos SHOGUN para que la privacidad no sea un ajuste — es la arquitectura.",
+
+  // LP Hero
+  "lp.hero.eyebrow": "Computadora IA en la Nube · Memoria de Trabajo · Automatización",
+  "lp.hero.tagline": "La única IA que conoce tu trabajo.",
+  "lp.hero.subtitle": "Recuerda todo. Hace todo.",
+  "lp.hero.bottomNote": "syogun.com · Desarrollado por Select KK, Tokio",
+
+  // LP Pain
+  "lp.pain.title": "Le has explicado lo mismo a la IA mil veces.",
+  "lp.pain.quote1": "El contexto es...",
+  "lp.pain.quote2": "La semana pasada decidimos...",
+  "lp.pain.quote3": "La razón por la que estamos construyendo esto...",
+  "lp.pain.body": "Cada sesión empieza de cero. Cada herramienta te olvida. Eso termina aquí.",
+
+  // LP Features
+  "lp.features.sectionTitle": "Tres pilares. Un sistema.",
+  "lp.features.memory.tag": "Memoria",
+  "lp.features.memory.title": "La IA que recuerda",
+  "lp.features.memory.body": "SHOGUN captura el contexto de tu trabajo — reuniones, investigación, decisiones — y construye una capa de memoria persistente. Pregúntale cualquier cosa sobre tu trabajo pasado y obtén una respuesta real.",
+  "lp.features.computer.tag": "Computadora",
+  "lp.features.computer.title": "Tu servidor en la nube",
+  "lp.features.computer.body": "Cada usuario obtiene una máquina Linux completa — tu propia computadora en la nube. Despliega apps, ejecuta scripts, gestiona archivos. Siempre activa, siempre tuya.",
+  "lp.features.command.tag": "Comando",
+  "lp.features.command.title": "Todos los modelos. Un solo lugar.",
+  "lp.features.command.body": "Claude, GPT-4o, Gemini — enruta al mejor modelo para la tarea. Trae tus propias claves API o usa créditos incluidos. Una interfaz, control total.",
+
+  // LP How It Works
+  "lp.howItWorks.title": "Cómo funciona",
+  "lp.howItWorks.step1.title": "Instala la app de escritorio",
+  "lp.howItWorks.step1.body": "Un agente ligero que observa tu flujo de trabajo — solo texto, nunca capturas de pantalla.",
+  "lp.howItWorks.step2.title": "Aprende tu trabajo",
+  "lp.howItWorks.step2.body": "Con el tiempo, SHOGUN construye una memoria de tus proyectos, decisiones y contexto.",
+  "lp.howItWorks.step3.title": "Pregunta lo que sea",
+  "lp.howItWorks.step3.body": "\"¿Qué decidimos sobre la API el martes pasado?\" — y obtén una respuesta real.",
+  "lp.howItWorks.step4.title": "Hace las cosas",
+  "lp.howItWorks.step4.body": "Ejecuta código, despliega servicios, automatiza tareas — todo desde una sola conversación.",
+
+  // LP Pricing
+  "lp.pricing.title": "Precios simples",
+  "lp.pricing.subtitle": "Empieza gratis. Escala cuando estés listo.",
+  "lp.pricing.monthly": "/mes",
+  "lp.pricing.free.description": "Prueba SHOGUN con funciones básicas",
+  "lp.pricing.basic.description": "Para personas que quieren la experiencia completa",
+  "lp.pricing.pro.description": "Para usuarios avanzados y profesionales",
+  "lp.pricing.ultra.description": "Para equipos y cargas de trabajo pesadas",
+  "lp.pricing.mostPopular": "Más popular",
+  "lp.pricing.features.credits": "{amount} créditos IA/mes",
+  "lp.pricing.features.cpu": "CPU de {count} núcleos",
+  "lp.pricing.features.memory": "{amount} RAM",
+  "lp.pricing.features.storage": "{amount} GB almacenamiento",
+  "lp.pricing.features.services": "Hasta {count} servicios",
+  "lp.pricing.features.customDomain": "Dominio personalizado",
+  "lp.pricing.features.alwaysOn": "Máquina siempre activa",
+  "lp.pricing.features.priority": "Soporte prioritario",
+  "lp.pricing.features.byok": "Trae tu propia clave API",
+  "lp.pricing.cta.free": "Empieza gratis",
+  "lp.pricing.cta.paid": "Obtener acceso anticipado",
+
+  // LP Bottom CTA
+  "lp.bottomCta.title": "Deja de explicarte a la IA.",
+  "lp.bottomCta.subtitle": "SHOGUN ya lo sabe.",
+  "lp.bottomCta.note": "Gratis para empezar · Sin tarjeta de crédito · syogun.com",
+
+  // LP Footer
+  "lp.footer.copyright": "© 2026 Select KK. Todos los derechos reservados.",
+  "lp.footer.privacy": "Privacidad",
+  "lp.footer.terms": "Términos",
 };
 
 export default es;

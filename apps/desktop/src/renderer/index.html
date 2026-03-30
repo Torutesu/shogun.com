@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'" />
+  <title>SHOGUN</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">SHOGUN</div>
+      <div class="connection-dot" id="connectionDot" title="Disconnected"></div>
+    </header>
+
+    <!-- Capture Section -->
+    <section class="section">
+      <div class="section-header">
+        <span class="section-title">Screen Capture</span>
+        <button class="toggle-btn" id="captureToggle" title="Toggle capture">
+          <span class="toggle-label" id="captureLabel">Active</span>
+          <span class="toggle-indicator active" id="captureIndicator"></span>
+        </button>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Today</span>
+        <span class="stat-value" id="todayCount">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Total</span>
+        <span class="stat-value" id="totalCount">0</span>
+      </div>
+    </section>
+
+    <!-- Recording Section -->
+    <section class="section">
+      <div class="section-header">
+        <span class="section-title">Meeting Recording</span>
+        <button class="record-btn" id="recordToggle" title="Start recording">
+          <span class="record-dot" id="recordDot"></span>
+          <span id="recordLabel">Start</span>
+        </button>
+      </div>
+      <div class="stat-row" id="recordingInfo" style="display: none;">
+        <span class="stat-label">Duration</span>
+        <span class="stat-value" id="recordDuration">0:00</span>
+      </div>
+      <div class="transcript-preview" id="transcriptPreview" style="display: none;"></div>
+    </section>
+
+    <!-- Sync Section -->
+    <section class="section">
+      <div class="section-header">
+        <span class="section-title">Sync</span>
+        <span class="sync-status" id="syncStatus">Idle</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Pending</span>
+        <span class="stat-value" id="unsyncedCount">0</span>
+      </div>
+    </section>
+
+    <!-- Excluded Apps -->
+    <section class="section">
+      <div class="section-header">
+        <span class="section-title">Excluded Apps</span>
+      </div>
+      <div class="excluded-list" id="excludedList">
+        <span class="empty-message">No excluded apps</span>
+      </div>
+      <div class="add-excluded">
+        <input
+          type="text"
+          id="excludedInput"
+          class="input"
+          placeholder="App name..."
+        />
+        <button class="btn-small" id="addExcluded">Add</button>
+      </div>
+    </section>
+  </div>
+
+  <script src="./renderer.js"></script>
+</body>
+</html>

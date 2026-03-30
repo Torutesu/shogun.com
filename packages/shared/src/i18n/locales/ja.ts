@@ -112,12 +112,80 @@ const ja: Record<keyof typeof en, string> = {
 
   // Privacy
   "privacy.title": "設計で守る。約束だけで守らない。",
+  "privacy.body": "あなたのワークメモリはあなたのもの。SHOGUNはプライバシーをトグルではなく、アーキテクチャとして設計しました。",
   "privacy.textOnly": "テキストのみ取得 — スクリーンショットは撮りません",
   "privacy.encrypted": "保存・通信時に暗号化",
   "privacy.noTraining": "あなたのデータで学習しません",
   "privacy.deleteAnytime": "いつでも何でも削除できます",
   "privacy.excludeApps": "アプリ単位で除外設定が可能",
   "privacy.youOwnIt": "データはあなたのもの。常に。",
+
+  // LP Hero
+  "lp.hero.eyebrow": "AIクラウドコンピュータ · ワークメモリ · 自動化",
+  "lp.hero.tagline": "あなたの仕事を知っている、唯一のAI。",
+  "lp.hero.subtitle": "すべてを記憶する。すべてをこなす。",
+  "lp.hero.bottomNote": "syogun.com · Select KK（東京）が開発",
+
+  // LP Pain
+  "lp.pain.title": "AIに同じ説明を、何度繰り返しましたか？",
+  "lp.pain.quote1": "背景を説明すると...",
+  "lp.pain.quote2": "先週決めたのは...",
+  "lp.pain.quote3": "これを作っている理由は...",
+  "lp.pain.body": "毎回ゼロから。どのツールもあなたを忘れる。それはここで終わります。",
+
+  // LP Features
+  "lp.features.sectionTitle": "3つの柱。1つのシステム。",
+  "lp.features.memory.tag": "メモリ",
+  "lp.features.memory.title": "記憶するAI",
+  "lp.features.memory.body": "SHOGUNは会議、リサーチ、意思決定などのコンテキストをキャプチャし、永続的なメモリ層を構築します。過去の仕事について何でも聞けば、本物の答えが返ってきます。",
+  "lp.features.computer.tag": "コンピュータ",
+  "lp.features.computer.title": "クラウド上のあなたのサーバー",
+  "lp.features.computer.body": "全ユーザーにフルLinuxマシンを提供。アプリのデプロイ、スクリプトの実行、ファイル管理。常時稼働、常にあなたのもの。",
+  "lp.features.command.tag": "コマンド",
+  "lp.features.command.title": "全モデル。一つの場所。",
+  "lp.features.command.body": "Claude、GPT-4o、Gemini — タスクに最適なモデルにルーティング。自分のAPIキーを持ち込むか、含まれるクレジットを使用。一つのインターフェース、完全なコントロール。",
+
+  // LP How It Works
+  "lp.howItWorks.title": "使い方",
+  "lp.howItWorks.step1.title": "デスクトップアプリをインストール",
+  "lp.howItWorks.step1.body": "ワークフローを見守る軽量エージェント — テキストのみ、スクリーンショットは撮りません。",
+  "lp.howItWorks.step2.title": "仕事を学習する",
+  "lp.howItWorks.step2.body": "SHOGUNは時間とともに、プロジェクト、決定、コンテキストのメモリを構築します。",
+  "lp.howItWorks.step3.title": "何でも聞く",
+  "lp.howItWorks.step3.body": "「先週の火曜日にAPIについて何を決めた？」— 本物の答えが返ってきます。",
+  "lp.howItWorks.step4.title": "実行する",
+  "lp.howItWorks.step4.body": "コードを実行、サービスをデプロイ、タスクを自動化 — すべて一つの会話から。",
+
+  // LP Pricing
+  "lp.pricing.title": "シンプルな料金体系",
+  "lp.pricing.subtitle": "無料で始める。準備ができたらスケール。",
+  "lp.pricing.monthly": "/月",
+  "lp.pricing.free.description": "基本機能でSHOGUNを試す",
+  "lp.pricing.basic.description": "フル体験を求める個人向け",
+  "lp.pricing.pro.description": "パワーユーザーとプロフェッショナル向け",
+  "lp.pricing.ultra.description": "チームと高負荷ワークロード向け",
+  "lp.pricing.mostPopular": "一番人気",
+  "lp.pricing.features.credits": "AIクレジット {amount}/月",
+  "lp.pricing.features.cpu": "{count}コアCPU",
+  "lp.pricing.features.memory": "RAM {amount}",
+  "lp.pricing.features.storage": "ストレージ {amount}GB",
+  "lp.pricing.features.services": "最大{count}サービス",
+  "lp.pricing.features.customDomain": "カスタムドメイン",
+  "lp.pricing.features.alwaysOn": "常時稼働マシン",
+  "lp.pricing.features.priority": "優先サポート",
+  "lp.pricing.features.byok": "自分のAPIキーを持ち込み可能",
+  "lp.pricing.cta.free": "無料で始める",
+  "lp.pricing.cta.paid": "早期アクセスを申し込む",
+
+  // LP Bottom CTA
+  "lp.bottomCta.title": "AIに自分を説明するのはもうやめよう。",
+  "lp.bottomCta.subtitle": "SHOGUNはすでに知っている。",
+  "lp.bottomCta.note": "無料で開始 · クレジットカード不要 · syogun.com",
+
+  // LP Footer
+  "lp.footer.copyright": "© 2026 Select KK. All rights reserved.",
+  "lp.footer.privacy": "プライバシー",
+  "lp.footer.terms": "利用規約",
 };
 
 export default ja;
