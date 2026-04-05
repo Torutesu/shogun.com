@@ -125,9 +125,7 @@ export const api = {
     },
     completeOnboarding(data: {
       handle: string;
-      communicationStyle?: string;
-      phone?: string;
-      lineId?: string;
+      apiKeys?: Record<string, string>;
     }) {
       return request<UserProfile>("/api/auth/onboarding", {
         method: "POST",
