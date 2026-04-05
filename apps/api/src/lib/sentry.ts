@@ -13,7 +13,8 @@ export async function initSentry(): Promise<void> {
   if (!dsn) return;
 
   try {
-    const Sentry = await import("@sentry/node");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const Sentry = await (Function('return import("@sentry/node")')() as Promise<any>);
     Sentry.init({
       dsn,
       environment: process.env.NODE_ENV ?? "development",
