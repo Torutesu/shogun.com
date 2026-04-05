@@ -333,15 +333,15 @@ export const api = {
     getUsage() {
       return request<{
         tier: string;
-        creditsUsedCents: number;
-        creditsIncludedCents: number;
-        breakdown: { model: string; tokens: number; costCents: number }[];
+        billingInterval: string;
+        demoCreditsCents: number;
+        connectedKeys: string[];
       }>("/api/billing/usage");
     },
-    createCheckout(tier: string) {
+    createCheckout(interval: "monthly" | "annual") {
       return request<{ url: string }>("/api/billing/checkout", {
         method: "POST",
-        body: JSON.stringify({ tier }),
+        body: JSON.stringify({ interval }),
       });
     },
     getPortalUrl() {

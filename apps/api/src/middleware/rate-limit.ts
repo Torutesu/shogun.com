@@ -1,6 +1,4 @@
 import { createMiddleware } from "hono/factory";
-import { TIER_CONFIGS, type SubscriptionTier } from "@shogun/shared";
-import { createServerClient } from "@shogun/db";
 import type { AuthVariables } from "./auth";
 
 interface RateLimitEntry {
@@ -9,6 +7,9 @@ interface RateLimitEntry {
 }
 
 const store = new Map<string, RateLimitEntry>();
+
+// Single plan = single rate limit (200 req/min)
+const RATE_LIMIT_PER_MIN = 200;
 
 // Cleanup stale entries every 5 minutes
 setInterval(() => {
@@ -20,31 +21,14 @@ setInterval(() => {
   }
 }, 5 * 60 * 1000);
 
-export const rateLimitMiddleware = createMiddleware<{ Variables: AuthVariables & { tier: SubscriptionTier } }>(
+export const rateLimitMiddleware = createMiddleware<{ Variables: AuthVariables }>(
   async (c, next) => {
     const userId = c.get("userId");
     if (!userId) {
       return await next();
     }
 
-    let tier: SubscriptionTier = c.get("tier") ?? ("" as SubscriptionTier);
-    if (!tier) {
-      try {
-        const supabase = createServerClient();
-        const { data } = await supabase
-          .from("subscriptions")
-          .select("tier")
-          .eq("user_id", userId)
-          .single();
-        tier = (data?.tier as SubscriptionTier) ?? "shogun";
-        c.set("tier", tier);
-      } catch {
-        tier = "shogun";
-      }
-    }
-    const config = TIER_CONFIGS[tier];
-    const limit = config.rateLimitPerMin;
-
+    const limit = RATE_LIMIT_PER_MIN;
     const now = Date.now();
     const windowMs = 60_000;
     const key = `rl:${userId}`;
