@@ -36,10 +36,10 @@ export const rateLimitMiddleware = createMiddleware<{ Variables: AuthVariables &
           .select("tier")
           .eq("user_id", userId)
           .single();
-        tier = (data?.tier as SubscriptionTier) ?? "free";
+        tier = (data?.tier as SubscriptionTier) ?? "shogun";
         c.set("tier", tier);
       } catch {
-        tier = "free";
+        tier = "shogun";
       }
     }
     const config = TIER_CONFIGS[tier];

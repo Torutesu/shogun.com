@@ -52,21 +52,15 @@ billing.get("/", async (c) => {
 // ---------------------------------------------------------------------------
 billing.post("/checkout", async (c) => {
   const userId = c.get("userId");
-  const body = await c.req.json<{ tier: SubscriptionTier }>();
+  const body = await c.req.json<{ interval: "monthly" | "annual" }>();
   const env = getEnv();
   const supabase = createServerClient();
 
-  if (!body.tier || !["basic", "pro", "ultra"].includes(body.tier)) {
-    return c.json({ error: { code: "INVALID_TIER", message: "tier must be basic, pro, or ultra", status: 400 } }, 400);
+  if (!body.interval || !["monthly", "annual"].includes(body.interval)) {
+    return c.json({ error: { code: "INVALID_INTERVAL", message: "interval must be monthly or annual", status: 400 } }, 400);
   }
 
-  const priceMap: Record<string, string> = {
-    basic: env.STRIPE_PRICE_BASIC,
-    pro: env.STRIPE_PRICE_PRO,
-    ultra: env.STRIPE_PRICE_ULTRA,
-  };
-
-  const priceId = priceMap[body.tier];
+  const priceId = body.interval === "annual" ? env.STRIPE_PRICE_ANNUAL : env.STRIPE_PRICE_MONTHLY;
 
   // Get or create Stripe customer
   const { data: subscription } = await supabase
@@ -101,7 +95,7 @@ billing.post("/checkout", async (c) => {
     line_items: [{ price: priceId, quantity: 1 }],
     success_url: `${env.APP_URL}/settings/billing?success=true`,
     cancel_url: `${env.APP_URL}/settings/billing?canceled=true`,
-    metadata: { user_id: userId, tier: body.tier },
+    metadata: { user_id: userId, tier: "shogun", interval: body.interval },
   });
 
   return c.json({ url: session.url });
@@ -161,17 +155,13 @@ billing.post("/webhook", async (c) => {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
       const userId = session.metadata?.user_id;
-      const tier = session.metadata?.tier as SubscriptionTier | undefined;
-      if (!userId || !tier) break;
+      if (!userId) break;
 
-      const tierConfig = TIER_CONFIGS[tier];
       await supabase
         .from("subscriptions")
         .update({
-          tier,
+          tier: "shogun",
           stripe_subscription_id: session.subscription as string,
-          ai_credits_included: tierConfig.creditsIncludedCents,
-          ai_credits_balance: tierConfig.creditsIncludedCents,
         })
         .eq("user_id", userId);
       break;
@@ -214,7 +204,7 @@ billing.post("/webhook", async (c) => {
         await supabase
           .from("subscriptions")
           .update({
-            tier: "free",
+            tier: "shogun",
             stripe_subscription_id: null,
             ai_credits_included: 0,
             current_period_start: null,
@@ -227,23 +217,7 @@ billing.post("/webhook", async (c) => {
     }
 
     case "invoice.payment_succeeded": {
-      const invoice = event.data.object as Stripe.Invoice;
-      const customerId = invoice.customer as string;
-
-      // Refresh credits on successful payment (new billing period)
-      const { data: subscription } = await supabase
-        .from("subscriptions")
-        .select("user_id, tier")
-        .eq("stripe_customer_id", customerId)
-        .single();
-
-      if (subscription) {
-        const tierConfig = TIER_CONFIGS[subscription.tier as SubscriptionTier];
-        await supabase
-          .from("subscriptions")
-          .update({ ai_credits_balance: tierConfig.creditsIncludedCents })
-          .eq("user_id", subscription.user_id);
-      }
+      // BYOK model — no credits to refresh on payment
       break;
     }
   }

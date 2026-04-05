@@ -44,7 +44,7 @@ services.post("/", zValidator("json", createServiceSchema), async (c) => {
     .eq("user_id", userId)
     .single();
 
-  const tier = (subscription?.tier ?? "free") as SubscriptionTier;
+  const tier = (subscription?.tier ?? "shogun") as SubscriptionTier;
   const tierConfig = TIER_CONFIGS[tier];
 
   const { count } = await supabase

@@ -11,7 +11,7 @@ vi.mock("@shogun/shared", async () => {
     ...actual,
     TIER_CONFIGS: {
       ...actual.TIER_CONFIGS,
-      free: { ...actual.TIER_CONFIGS.free, rateLimitPerMin: 3 }, // low limit for testing
+      shogun: { ...(actual.TIER_CONFIGS.shogun ?? actual.TIER_CONFIGS.personal), rateLimitPerMin: 3 }, // low limit for testing
     },
   };
 });
@@ -21,7 +21,7 @@ vi.mock("@shogun/db", () => ({
     from: () => ({
       select: () => ({
         eq: () => ({
-          single: () => Promise.resolve({ data: { tier: "free" }, error: null }),
+          single: () => Promise.resolve({ data: { tier: "shogun" }, error: null }),
         }),
       }),
     }),

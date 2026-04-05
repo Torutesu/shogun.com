@@ -107,22 +107,26 @@ One AI. Knows your work. Does your work.
 | Database | Supabase (PostgreSQL + pgvector) |
 | AI | Claude API, OpenAI, Gemini — all with Tool Use |
 | Storage | Cloudflare R2 (100GB/user) |
-| Billing | Stripe (Free / $18 / $64 / $200 per month) |
+| Billing | Stripe (SHOGUN $49/mo annual / $62/mo monthly) |
 | Jobs | BullMQ (Redis) |
 
 ---
 
 ## Pricing
 
-| | Free | Basic | Pro | Ultra |
-|---|------|-------|-----|-------|
-| Price | $0/mo | $18/mo | $64/mo | $200/mo |
-| AI Credits | Daily limit | $10/mo | $40/mo | $100/mo |
-| CPU | 1 core | 4 cores | 16 cores | 64 cores |
-| RAM | 256MB | 32GB | 128GB | 512GB |
-| Always On | No | Yes | Yes | Yes |
-| Services | 1 | 5 | 10 | 50 |
-| BYOK | ✅ | ✅ | ✅ | ✅ |
+| | SHOGUN |
+|---|--------|
+| Annual | $49/mo ($588/yr) |
+| Monthly | $62/mo |
+| Cloud Computer | 8-core CPU, 64GB RAM |
+| Storage | 100GB |
+| Always On | Yes |
+| Custom Domain | Yes |
+| Services | Up to 10 |
+| AI Models | Bring your own keys (Claude, GPT, Gemini) |
+| Demo Credits | $5 included |
+
+> Team plan coming soon. 14-day free trial on all signups.
 
 ---
 
@@ -254,13 +258,19 @@ SHOGUNは、**あなたの仕事を全て記憶する**パーソナルAIクラ�
 
 ## 料金
 
-| | Free | Basic | Pro | Ultra |
-|---|------|-------|-----|-------|
-| 月額 | ¥0 | ¥2,700 | ¥9,500 | ¥30,000 |
-| AIクレジット | 日次制限 | ¥1,500/月 | ¥6,000/月 | ¥15,000/月 |
-| CPU | 1コア | 4コア | 16コア | 64コア |
-| RAM | 256MB | 32GB | 128GB | 512GB |
-| 常時稼働 | No | Yes | Yes | Yes |
+| | SHOGUN |
+|---|--------|
+| 年額プラン | $49/月 ($588/年) |
+| 月額プラン | $62/月 |
+| クラウドコンピュータ | 8コアCPU、64GB RAM |
+| ストレージ | 100GB |
+| 常時稼働 | Yes |
+| カスタムドメイン | Yes |
+| サービス | 最大10 |
+| AIモデル | 自分のAPIキーを使用（Claude、GPT、Gemini） |
+| デモクレジット | $5分を付与 |
+
+> チームプランは近日公開予定。全登録に14日間無料トライアル。
 
 ---
 

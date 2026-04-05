@@ -5,7 +5,7 @@ const es: Record<keyof typeof en, string> = {
   "common.appName": "SHOGUN",
   "common.tagline": "La única IA que conoce tu trabajo.",
   "common.subtitle": "Recuerda todo. Hace todo.",
-  "common.cta.earlyAccess": "Obtener acceso anticipado",
+  "common.cta.earlyAccess": "Iniciar prueba gratis",
   "common.cta.howItWorks": "Ver cómo funciona",
   "common.loading": "Cargando...",
   "common.error": "Algo salió mal",
@@ -80,13 +80,11 @@ const es: Record<keyof typeof en, string> = {
   "billing.credits": "Créditos IA",
   "billing.creditsRemaining": "restantes este mes",
   "billing.byok": "Usa tu propia clave API",
-  "billing.byokHint": "Usa tu propia clave API — sin cargo de créditos",
+  "billing.byokHint": "Conecta tu propia clave API — Claude, GPT o Gemini. Pagas directamente al proveedor.",
 
   // Tiers
-  "tier.free": "Gratis",
-  "tier.basic": "Básico",
-  "tier.pro": "Pro",
-  "tier.ultra": "Ultra",
+  "tier.shogun": "SHOGUN",
+  "tier.team": "Equipo",
 
   // Services
   "services.title": "Servicios",
@@ -122,12 +120,12 @@ const es: Record<keyof typeof en, string> = {
 
   // LP Hero
   "lp.hero.eyebrow": "Computadora IA en la Nube · Memoria de Trabajo · Automatización",
-  "lp.hero.tagline": "La única IA que conoce tu trabajo.",
-  "lp.hero.subtitle": "Recuerda todo. Hace todo.",
+  "lp.hero.tagline": "Una IA para gobernarlos a todos.",
+  "lp.hero.subtitle": "Cada herramienta. Cada pestaña. Cada tarea. Un centro de comando.",
   "lp.hero.bottomNote": "syogun.com · Desarrollado por Select KK, Tokio",
 
   // LP Pain
-  "lp.pain.title": "Le has explicado lo mismo a la IA mil veces.",
+  "lp.pain.title": "Le has explicado lo mismo a la IA mil veces. Eso termina aquí.",
   "lp.pain.quote1": "El contexto es...",
   "lp.pain.quote2": "La semana pasada decidimos...",
   "lp.pain.quote3": "La razón por la que estamos construyendo esto...",
@@ -157,30 +155,34 @@ const es: Record<keyof typeof en, string> = {
   "lp.howItWorks.step4.body": "Ejecuta código, despliega servicios, automatiza tareas — todo desde una sola conversación.",
 
   // LP Pricing
-  "lp.pricing.title": "Precios simples",
-  "lp.pricing.subtitle": "Empieza gratis. Escala cuando estés listo.",
+  "lp.pricing.title": "Un plan. Todo incluido.",
+  "lp.pricing.subtitle": "Sin niveles que comparar. Sin funciones bloqueadas. Solo SHOGUN.",
   "lp.pricing.monthly": "/mes",
-  "lp.pricing.free.description": "Prueba SHOGUN con funciones básicas",
-  "lp.pricing.basic.description": "Para personas que quieren la experiencia completa",
-  "lp.pricing.pro.description": "Para usuarios avanzados y profesionales",
-  "lp.pricing.ultra.description": "Para equipos y cargas de trabajo pesadas",
-  "lp.pricing.mostPopular": "Más popular",
-  "lp.pricing.features.credits": "{amount} créditos IA/mes",
-  "lp.pricing.features.cpu": "CPU de {count} núcleos",
-  "lp.pricing.features.memory": "{amount} RAM",
-  "lp.pricing.features.storage": "{amount} GB almacenamiento",
-  "lp.pricing.features.services": "Hasta {count} servicios",
-  "lp.pricing.features.customDomain": "Dominio personalizado",
-  "lp.pricing.features.alwaysOn": "Máquina siempre activa",
-  "lp.pricing.features.priority": "Soporte prioritario",
-  "lp.pricing.features.byok": "Trae tu propia clave API",
-  "lp.pricing.cta.free": "Empieza gratis",
-  "lp.pricing.cta.paid": "Obtener acceso anticipado",
+  "lp.pricing.plan.name": "SHOGUN",
+  "lp.pricing.plan.description": "Tu computadora IA en la nube. Potencia total. Sin límites.",
+  "lp.pricing.plan.annualNote": "por mes, facturado anualmente ($588/año)",
+  "lp.pricing.plan.monthlyNote": "por mes, facturado mensualmente",
+  "lp.pricing.plan.annualSave": "Ahorra $156/año con facturación anual",
+  "lp.pricing.plan.cta": "Iniciar prueba gratis de 14 días",
+  "lp.pricing.plan.feature1": "Computadora dedicada en la nube (8 núcleos, 64GB RAM)",
+  "lp.pricing.plan.feature2": "Memoria de trabajo — captura de pantalla, transcripción, búsqueda semántica",
+  "lp.pricing.plan.feature3": "Todos los modelos IA — trae tus claves API (Claude, GPT, Gemini)",
+  "lp.pricing.plan.feature4": "Dominio personalizado, servidor siempre activo, 100GB almacenamiento",
+  "lp.pricing.plan.feature5": "$5 en créditos demo incluidos para probar antes de conectar tus claves",
+  "lp.pricing.plan.byokNote": "Trae tus propias claves API. Nunca cobramos por uso de IA.",
+  "lp.pricing.team.title": "Equipo",
+  "lp.pricing.team.description": "Espacios compartidos, memoria de equipo, registros de auditoría.",
+  "lp.pricing.team.cta": "Próximamente",
+
+  // LP Waitlist
+  "lp.waitlist.placeholder": "Ingresa tu email",
+  "lp.waitlist.cta": "Unirse a la lista",
+  "lp.waitlist.success": "Estás en la lista. Te contactaremos pronto.",
 
   // LP Bottom CTA
   "lp.bottomCta.title": "Deja de explicarte a la IA.",
   "lp.bottomCta.subtitle": "SHOGUN ya lo sabe.",
-  "lp.bottomCta.note": "Gratis para empezar · Sin tarjeta de crédito · syogun.com",
+  "lp.bottomCta.note": "14 días de prueba gratis · $5 créditos demo · Sin recargo IA · syogun.com",
 
   // LP Footer
   "lp.footer.copyright": "© 2026 Select KK. Todos los derechos reservados.",

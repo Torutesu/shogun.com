@@ -58,7 +58,7 @@ We're Select KK, based in Tokyo. Small team, obsessed with building tools that r
 
 **The ask:**
 
-Try the free tier. Break things. Tell us what's missing. We're building this for people who live in their terminal, their IDE, their browser — and want AI that actually keeps up.
+Start your 14-day free trial. Break things. Tell us what's missing. We're building this for people who live in their terminal, their IDE, their browser — and want AI that actually keeps up.
 
 Feedback is everything at this stage. Drop a comment, DM me, or email us. We're here all day.
 
@@ -136,7 +136,7 @@ SHOGUNでAIと話すとき、AIはあなたが何をしていたか既に知っ�
 
 **お願い：**
 
-無料プランをお試しください。壊してください。足りないものを教えてください。ターミナル、IDE、ブラウザで生活し、AIに追いついてほしいと思っている人のために作っています。
+14日間の無料トライアルをお試しください。壊してください。足りないものを教えてください。ターミナル、IDE、ブラウザで生活し、AIに追いついてほしいと思っている人のために作っています。
 
 この段階ではフィードバックがすべてです。コメント、DM、メールなんでも。一日中ここにいます。
 

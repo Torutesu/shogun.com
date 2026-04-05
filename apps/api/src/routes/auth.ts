@@ -36,9 +36,11 @@ auth.post("/signup", zValidator("json", signupSchema), async (c) => {
     }),
     admin.from("subscriptions").insert({
       user_id: userId,
-      tier: "free",
+      tier: "shogun",
+      trial_ends_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
       ai_credits_balance: 0,
       ai_credits_included: 0,
+      demo_credits_remaining: 500,
       cancel_at_period_end: false,
     }),
   ]);

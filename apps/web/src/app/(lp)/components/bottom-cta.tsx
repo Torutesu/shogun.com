@@ -1,6 +1,6 @@
 import type { Locale } from "@shogun/shared/types";
 import { t } from "@shogun/shared/i18n";
-import Link from "next/link";
+import WaitlistForm from "./waitlist-form";
 
 interface BottomCtaProps {
   locale: Locale;
@@ -24,14 +24,9 @@ export default function BottomCta({ locale }: BottomCtaProps) {
           {t(locale, "lp.bottomCta.subtitle")}
         </p>
 
-        {/* CTA */}
+        {/* Waitlist */}
         <div className="mt-12">
-          <Link
-            href="/signup"
-            className="inline-flex items-center justify-center h-14 px-12 bg-gold text-dark font-body font-semibold text-base tracking-wide rounded-none hover:bg-gold-dark transition-colors"
-          >
-            {t(locale, "common.cta.earlyAccess")}
-          </Link>
+          <WaitlistForm locale={locale} variant="bottom" />
         </div>
 
         {/* Note */}

@@ -277,9 +277,10 @@ Response:
 ### `GET /billing`
 ```json
 {
-  "tier": "basic",
-  "credits_remaining": 850,
-  "credits_included": 1000,
+  "tier": "shogun",
+  "billing_interval": "annual",
+  "demo_credits_remaining": 500,
+  "demo_credits_included": 500,
   "current_period_end": "2026-04-30T00:00:00Z",
   "usage_this_period": [
     {"provider": "anthropic", "model": "claude-sonnet-4-20250514", "cost_cents": 120},
@@ -336,9 +337,6 @@ All errors follow:
 
 ## Rate Limits
 
-| Tier  | Requests/min | WebSocket connections | File upload/req |
-|-------|-------------|----------------------|-----------------|
-| Free  | 30          | 1                    | 10MB            |
-| Basic | 120         | 3                    | 100MB           |
-| Pro   | 300         | 5                    | 500MB           |
-| Ultra | 600         | 10                   | 1GB             |
+| Tier     | Requests/min | WebSocket connections | File upload/req |
+|----------|-------------|----------------------|-----------------|
+| SHOGUN   | 200         | 5                    | 500MB           |

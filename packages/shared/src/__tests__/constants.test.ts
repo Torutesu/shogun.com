@@ -1,6 +1,9 @@
 import { describe, it, expect } from "vitest";
 import {
-  TIER_CONFIGS,
+  PLAN,
+  ANNUAL_TOTAL_USD,
+  MONTHLY_TOTAL_USD,
+  ANNUAL_SAVINGS_USD,
   MODEL_CONFIGS,
   HANDLE_REGEX,
   RESERVED_HANDLES,
@@ -8,50 +11,44 @@ import {
   LOCALE_REGION_MAP,
 } from "../constants";
 
-describe("TIER_CONFIGS", () => {
-  const tiers = ["free", "basic", "pro", "ultra"] as const;
-
-  it("has all 4 tiers", () => {
-    expect(Object.keys(TIER_CONFIGS).sort()).toEqual([...tiers].sort());
+describe("PLAN", () => {
+  it("has correct annual price ($49/mo)", () => {
+    expect(PLAN.priceAnnualUsd).toBe(49);
   });
 
-  it.each(tiers)("tier '%s' has all required properties", (tier) => {
-    const config = TIER_CONFIGS[tier];
-    expect(config.tier).toBe(tier);
-    expect(typeof config.priceUsd).toBe("number");
-    expect(typeof config.priceJpy).toBe("number");
-    expect(typeof config.creditsIncludedCents).toBe("number");
-    expect(typeof config.cpuCores).toBe("number");
-    expect(typeof config.memoryMb).toBe("number");
-    expect(typeof config.storageGb).toBe("number");
-    expect(typeof config.maxServices).toBe("number");
-    expect(typeof config.customDomain).toBe("boolean");
-    expect(typeof config.alwaysOn).toBe("boolean");
-    expect(typeof config.rateLimitPerMin).toBe("number");
-    expect(typeof config.maxWsConnections).toBe("number");
-    expect(typeof config.maxUploadMb).toBe("number");
-    expect(typeof config.prioritySupport).toBe("boolean");
+  it("has correct monthly price ($62/mo, 25% markup)", () => {
+    expect(PLAN.priceMonthlyUsd).toBe(62);
   });
 
-  it("free tier has $0 price and no credits", () => {
-    expect(TIER_CONFIGS.free.priceUsd).toBe(0);
-    expect(TIER_CONFIGS.free.creditsIncludedCents).toBe(0);
+  it("monthly is ~25% more than annual", () => {
+    const markup = (PLAN.priceMonthlyUsd - PLAN.priceAnnualUsd) / PLAN.priceAnnualUsd;
+    expect(markup).toBeCloseTo(0.265, 1);
   });
 
-  it("paid tiers have increasing prices", () => {
-    expect(TIER_CONFIGS.basic.priceUsd).toBeLessThan(TIER_CONFIGS.pro.priceUsd);
-    expect(TIER_CONFIGS.pro.priceUsd).toBeLessThan(TIER_CONFIGS.ultra.priceUsd);
+  it("annual total is $588/yr", () => {
+    expect(ANNUAL_TOTAL_USD).toBe(588);
   });
 
-  it("paid tiers have increasing credits", () => {
-    expect(TIER_CONFIGS.basic.creditsIncludedCents).toBeLessThan(TIER_CONFIGS.pro.creditsIncludedCents);
-    expect(TIER_CONFIGS.pro.creditsIncludedCents).toBeLessThan(TIER_CONFIGS.ultra.creditsIncludedCents);
+  it("monthly total is $744/yr", () => {
+    expect(MONTHLY_TOTAL_USD).toBe(744);
   });
 
-  it("paid tiers have increasing rate limits", () => {
-    expect(TIER_CONFIGS.free.rateLimitPerMin).toBeLessThan(TIER_CONFIGS.basic.rateLimitPerMin);
-    expect(TIER_CONFIGS.basic.rateLimitPerMin).toBeLessThan(TIER_CONFIGS.pro.rateLimitPerMin);
-    expect(TIER_CONFIGS.pro.rateLimitPerMin).toBeLessThan(TIER_CONFIGS.ultra.rateLimitPerMin);
+  it("annual savings is $156/yr", () => {
+    expect(ANNUAL_SAVINGS_USD).toBe(156);
+  });
+
+  it("includes $5 demo credits (500 cents)", () => {
+    expect(PLAN.demoCreditsCents).toBe(500);
+  });
+
+  it("has required resource properties", () => {
+    expect(PLAN.cpuCores).toBe(8);
+    expect(PLAN.memoryMb).toBe(65536);
+    expect(PLAN.storageGb).toBe(100);
+    expect(PLAN.maxServices).toBe(10);
+    expect(PLAN.customDomain).toBe(true);
+    expect(PLAN.alwaysOn).toBe(true);
+    expect(PLAN.maxUploadMb).toBe(500);
   });
 });
 

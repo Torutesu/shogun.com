@@ -13,9 +13,8 @@ const envSchema = z.object({
   // Stripe
   STRIPE_SECRET_KEY: z.string().min(1),
   STRIPE_WEBHOOK_SECRET: z.string().min(1),
-  STRIPE_PRICE_BASIC: z.string().min(1).default("price_basic"),
-  STRIPE_PRICE_PRO: z.string().min(1).default("price_pro"),
-  STRIPE_PRICE_ULTRA: z.string().min(1).default("price_ultra"),
+  STRIPE_PRICE_MONTHLY: z.string().min(1).default("price_monthly"),
+  STRIPE_PRICE_ANNUAL: z.string().min(1).default("price_annual"),
 
   // Fly.io
   FLY_API_TOKEN: z.string().min(1),

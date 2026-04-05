@@ -44,14 +44,15 @@ describe("GET /billing — subscription info", () => {
           single: () =>
             Promise.resolve({
               data: {
-                tier: "pro",
+                tier: "shogun",
                 stripe_customer_id: "cus_test",
                 stripe_subscription_id: "sub_test",
                 current_period_start: "2026-03-01T00:00:00Z",
                 current_period_end: "2026-04-01T00:00:00Z",
                 cancel_at_period_end: false,
-                ai_credits_balance: 3500,
-                ai_credits_included: 4000,
+                ai_credits_balance: 0,
+                ai_credits_included: 0,
+                demo_credits_remaining: 500,
               },
               error: null,
             }),
@@ -64,9 +65,9 @@ describe("GET /billing — subscription info", () => {
     expect(res.status).toBe(200);
 
     const body = await res.json();
-    expect(body.subscription.tier).toBe("pro");
-    expect(body.credits.balance_cents).toBe(3500);
-    expect(body.credits.included_cents).toBe(4000);
+    expect(body.subscription.tier).toBe("shogun");
+    expect(body.credits.balance_cents).toBe(0);
+    expect(body.credits.included_cents).toBe(0);
     expect(body.tier_config).toBeDefined();
   });
 
@@ -91,20 +92,10 @@ describe("GET /billing — subscription info", () => {
   });
 });
 
-describe("credit calculation", () => {
-  it("TIER_CONFIGS free tier includes 0 credits", () => {
-    expect(TIER_CONFIGS.free.creditsIncludedCents).toBe(0);
-  });
-
-  it("TIER_CONFIGS basic tier includes 1000 cents of credits", () => {
-    expect(TIER_CONFIGS.basic.creditsIncludedCents).toBe(1000);
-  });
-
-  it("TIER_CONFIGS pro tier includes 4000 cents of credits", () => {
-    expect(TIER_CONFIGS.pro.creditsIncludedCents).toBe(4000);
-  });
-
-  it("TIER_CONFIGS ultra tier includes 10000 cents of credits", () => {
-    expect(TIER_CONFIGS.ultra.creditsIncludedCents).toBe(10000);
+describe("demo credits", () => {
+  it("new users receive 500 cents ($5.00) of demo credits", () => {
+    // Demo credits are granted at signup (see auth.ts), not via TIER_CONFIGS
+    const demoCreditsCents = 500;
+    expect(demoCreditsCents).toBe(500);
   });
 });

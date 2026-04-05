@@ -1,6 +1,6 @@
 import type { Locale } from "@shogun/shared/types";
 import { t } from "@shogun/shared/i18n";
-import Link from "next/link";
+import WaitlistForm from "./waitlist-form";
 
 interface HeroProps {
   locale: Locale;
@@ -44,6 +44,17 @@ export default function Hero({ locale }: HeroProps) {
           SHO<span className="text-gold">G</span>UN
         </h1>
 
+        {/* Animated gold accent line */}
+        <div className="mx-auto mt-4 h-px w-24 overflow-hidden">
+          <div
+            className="h-full w-full animate-pulse"
+            style={{
+              background:
+                "linear-gradient(90deg, transparent, #C8A96E, transparent)",
+            }}
+          />
+        </div>
+
         {/* Tagline */}
         <p className="mt-6 font-body font-light text-[clamp(1rem,2.5vw,1.25rem)] text-dark-text leading-relaxed">
           {t(locale, "lp.hero.tagline")}
@@ -54,17 +65,16 @@ export default function Hero({ locale }: HeroProps) {
           {t(locale, "lp.hero.subtitle")}
         </p>
 
-        {/* CTAs */}
-        <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Link
-            href="/signup"
-            className="inline-flex items-center justify-center h-12 px-8 bg-gold text-dark font-body font-medium text-sm tracking-wide rounded-none hover:bg-gold-dark transition-colors"
-          >
-            {t(locale, "common.cta.earlyAccess")}
-          </Link>
+        {/* Waitlist */}
+        <div className="mt-10">
+          <WaitlistForm locale={locale} variant="hero" />
+        </div>
+
+        {/* Secondary CTA */}
+        <div className="mt-4">
           <a
             href="#how-it-works"
-            className="inline-flex items-center justify-center h-12 px-8 border border-dark-border-bright text-dark-text font-body font-medium text-sm tracking-wide rounded-none hover:border-dark-text-muted transition-colors"
+            className="inline-flex items-center justify-center h-10 px-6 text-dark-text-muted font-body text-sm tracking-wide hover:text-dark-text transition-colors"
           >
             {t(locale, "common.cta.howItWorks")}
           </a>

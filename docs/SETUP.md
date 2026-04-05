@@ -66,11 +66,10 @@ Supabase Dashboard → Settings → API:
 ```
 Stripe Dashboard → Products:
 
-1. SHOGUN Basic — $18/mo (¥2,700/mo)
-2. SHOGUN Pro — $64/mo (¥9,500/mo)
-3. SHOGUN Ultra — $200/mo (¥30,000/mo)
+1. SHOGUN — $49/mo (annual, $588/yr) / $62/mo (monthly)
 
-各プロダクトに月額 recurring price を作成
+1つのプロダクトに年額・月額の2つの recurring price を作成
+14日間の無料トライアルを Price 設定で有効化
 ```
 
 ### 2.2 Webhook設定
@@ -93,16 +92,15 @@ STRIPE_SECRET_KEY=sk_live_...     (or sk_test_... for dev)
 STRIPE_WEBHOOK_SECRET=whsec_...
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...
 
-STRIPE_PRICE_BASIC=price_...
-STRIPE_PRICE_PRO=price_...
-STRIPE_PRICE_ULTRA=price_...
+STRIPE_PRICE_ANNUAL=price_...
+STRIPE_PRICE_MONTHLY=price_...
 ```
 
 ### 2.4 Customer Portal設定
 ```
 Stripe Dashboard → Settings → Billing → Customer Portal
 - Subscription cancellation: 許可
-- Subscription switching: 許可（proration: immediate）
+- Billing interval switching (annual ↔ monthly): 許可（proration: immediate）
 - Invoice history: 表示
 ```
 

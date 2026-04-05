@@ -86,7 +86,7 @@ machine.post("/provision", async (c) => {
     .eq("user_id", userId)
     .single();
 
-  const tier = (subscription?.tier ?? "free") as "free" | "basic" | "pro" | "ultra";
+  const tier = (subscription?.tier ?? "shogun") as "shogun";
   const region = LOCALE_REGION_MAP[profile.locale] ?? "iad";
 
   // Create DB record in provisioning state

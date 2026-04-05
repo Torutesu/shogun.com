@@ -15,9 +15,12 @@
     "db:migrate": "turbo db:migrate --filter=@shogun/db",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "marketing": "tsx scripts/marketing/cli.ts"
   },
   "devDependencies": {
+    "playwright": "^1.59.1",
+    "tsx": "^4.19.0",
     "turbo": "^2.4.0",
     "typescript": "^5.7.0",
     "vitest": "^3.2.4"

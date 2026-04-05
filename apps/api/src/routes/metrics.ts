@@ -38,8 +38,8 @@ export function observeHistogram(name: string, labels: Record<string, string>, v
     histograms.set(key, data);
   }
   for (let i = 0; i < DURATION_BUCKETS.length; i++) {
-    if (value <= DURATION_BUCKETS[i]) {
-      data.buckets[i]++;
+    if (value <= DURATION_BUCKETS[i]!) {
+      data.buckets[i]!++;
     }
   }
   data.sum += value;
@@ -77,7 +77,7 @@ function serializeCounters(): string {
   const lines: string[] = [];
   const seen = new Set<string>();
   for (const [key, value] of counters) {
-    const name = key.split("{")[0];
+    const name = key.split("{")[0]!;
     if (!seen.has(name)) {
       lines.push(`# HELP ${name} Counter`);
       lines.push(`# TYPE ${name} counter`);
@@ -92,7 +92,7 @@ function serializeGauges(): string {
   const lines: string[] = [];
   const seen = new Set<string>();
   for (const [key, value] of gauges) {
-    const name = key.split("{")[0];
+    const name = key.split("{")[0]!;
     if (!seen.has(name)) {
       lines.push(`# HELP ${name} Gauge`);
       lines.push(`# TYPE ${name} gauge`);
@@ -107,7 +107,7 @@ function serializeHistograms(): string {
   const lines: string[] = [];
   const seen = new Set<string>();
   for (const [key, data] of histograms) {
-    const name = key.split("{")[0];
+    const name = key.split("{")[0]!;
     // Extract labels portion (between { and })
     const labelsMatch = key.match(/\{(.+)\}/);
     const labelsStr = labelsMatch ? labelsMatch[1] : "";
@@ -121,8 +121,8 @@ function serializeHistograms(): string {
 
     let cumulative = 0;
     for (let i = 0; i < DURATION_BUCKETS.length; i++) {
-      cumulative += data.buckets[i] ?? 0;
-      lines.push(`${name}_bucket{${labelPrefix}le="${DURATION_BUCKETS[i]}"} ${cumulative}`);
+      cumulative += data.buckets[i]!;
+      lines.push(`${name}_bucket{${labelPrefix}le="${DURATION_BUCKETS[i]!}"} ${cumulative}`);
     }
     lines.push(`${name}_bucket{${labelPrefix}le="+Inf"} ${data.count}`);
     lines.push(`${name}_sum{${labelsStr}} ${data.sum}`);

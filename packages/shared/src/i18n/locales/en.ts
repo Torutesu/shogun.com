@@ -3,7 +3,7 @@ const en = {
   "common.appName": "SHOGUN",
   "common.tagline": "The only AI that knows your work.",
   "common.subtitle": "Remembers everything. Does everything.",
-  "common.cta.earlyAccess": "Get early access",
+  "common.cta.earlyAccess": "Start free trial",
   "common.cta.howItWorks": "See how it works",
   "common.loading": "Loading...",
   "common.error": "Something went wrong",
@@ -78,13 +78,11 @@ const en = {
   "billing.credits": "AI credits",
   "billing.creditsRemaining": "remaining this month",
   "billing.byok": "Bring Your Own Key",
-  "billing.byokHint": "Use your own API key — no credits charged",
+  "billing.byokHint": "Connect your own API key — Claude, GPT, or Gemini. You pay the provider directly.",
 
   // Tiers
-  "tier.free": "Free",
-  "tier.basic": "Basic",
-  "tier.pro": "Pro",
-  "tier.ultra": "Ultra",
+  "tier.shogun": "SHOGUN",
+  "tier.team": "Team",
 
   // Services
   "services.title": "Services",
@@ -120,12 +118,12 @@ const en = {
 
   // LP Hero
   "lp.hero.eyebrow": "AI Cloud Computer · Work Memory · Automation",
-  "lp.hero.tagline": "The only AI that knows your work.",
-  "lp.hero.subtitle": "Remembers everything. Does everything.",
+  "lp.hero.tagline": "One AI to rule them all.",
+  "lp.hero.subtitle": "Every tool. Every tab. Every task. One command center.",
   "lp.hero.bottomNote": "syogun.com · Built by Select KK, Tokyo",
 
   // LP Pain
-  "lp.pain.title": "You've explained yourself to AI a thousand times.",
+  "lp.pain.title": "You've explained yourself to AI a thousand times. It ends here.",
   "lp.pain.quote1": "So the context is...",
   "lp.pain.quote2": "Last week we decided...",
   "lp.pain.quote3": "The reason we're building this...",
@@ -155,30 +153,34 @@ const en = {
   "lp.howItWorks.step4.body": "Run code, deploy services, automate tasks — all from a single conversation.",
 
   // LP Pricing
-  "lp.pricing.title": "Simple pricing",
-  "lp.pricing.subtitle": "Start free. Scale when you're ready.",
+  "lp.pricing.title": "One plan. Everything included.",
+  "lp.pricing.subtitle": "No tiers to compare. No features locked. Just SHOGUN.",
   "lp.pricing.monthly": "/mo",
-  "lp.pricing.free.description": "Try SHOGUN with basic features",
-  "lp.pricing.basic.description": "For individuals who want the full experience",
-  "lp.pricing.pro.description": "For power users and professionals",
-  "lp.pricing.ultra.description": "For teams and heavy workloads",
-  "lp.pricing.mostPopular": "Most popular",
-  "lp.pricing.features.credits": "{amount} AI credits/mo",
-  "lp.pricing.features.cpu": "{count}-core CPU",
-  "lp.pricing.features.memory": "{amount} RAM",
-  "lp.pricing.features.storage": "{amount} GB storage",
-  "lp.pricing.features.services": "Up to {count} services",
-  "lp.pricing.features.customDomain": "Custom domain",
-  "lp.pricing.features.alwaysOn": "Always-on machine",
-  "lp.pricing.features.priority": "Priority support",
-  "lp.pricing.features.byok": "Bring your own API key",
-  "lp.pricing.cta.free": "Get started free",
-  "lp.pricing.cta.paid": "Get early access",
+  "lp.pricing.plan.name": "SHOGUN",
+  "lp.pricing.plan.description": "Your AI cloud computer. Full power. No limits.",
+  "lp.pricing.plan.annualNote": "per month, billed annually ($588/yr)",
+  "lp.pricing.plan.monthlyNote": "per month, billed monthly",
+  "lp.pricing.plan.annualSave": "Save $156/yr with annual billing",
+  "lp.pricing.plan.cta": "Start 14-day free trial",
+  "lp.pricing.plan.feature1": "Dedicated cloud computer (8-core, 64GB RAM)",
+  "lp.pricing.plan.feature2": "Work memory — screen capture, meeting transcription, semantic search",
+  "lp.pricing.plan.feature3": "All AI models — bring your own API keys (Claude, GPT, Gemini)",
+  "lp.pricing.plan.feature4": "Custom domain, always-on server, 100GB storage",
+  "lp.pricing.plan.feature5": "$5 demo credits included to try before connecting your keys",
+  "lp.pricing.plan.byokNote": "You bring your own AI API keys. We never charge for AI usage.",
+  "lp.pricing.team.title": "Team",
+  "lp.pricing.team.description": "Shared workspaces, team memory, audit logs.",
+  "lp.pricing.team.cta": "Coming soon",
+
+  // LP Waitlist
+  "lp.waitlist.placeholder": "Enter your email",
+  "lp.waitlist.cta": "Join waitlist",
+  "lp.waitlist.success": "You're on the list. We'll be in touch.",
 
   // LP Bottom CTA
   "lp.bottomCta.title": "Stop explaining yourself to AI.",
   "lp.bottomCta.subtitle": "SHOGUN already knows.",
-  "lp.bottomCta.note": "Free to start · No credit card required · syogun.com",
+  "lp.bottomCta.note": "14-day free trial · $5 demo credits · No AI markup · syogun.com",
 
   // LP Footer
   "lp.footer.copyright": "© 2026 Select KK. All rights reserved.",

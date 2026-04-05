@@ -95,7 +95,7 @@ Deploy sites. Run automations. 24/7.
 Claude, GPT-4o, Gemini — all in one place.
 BYOK supported.
 
-Try free → syogun.com
+Start free trial → syogun.com
 ```
 
 ### Phase 2: コンテンツマーケティング (Month 2-3)
@@ -128,7 +128,7 @@ Try free → syogun.com
 - 直接競合ゼロ（Zoは英語のみ）
 - Select KKの東京ネットワーク
 - AIツール導入率が急上昇中
-- JPYプライシング対応済み
+- USDプライシング（グローバル統一）
 
 **チャネル**:
 - Note.com: 開発ストーリー連載
@@ -150,33 +150,38 @@ Try free → syogun.com
 
 ## 4. 価格戦略
 
-### 個人
-- **Free → Basic ($18)** の転換率目標: 15%
-  - トリガー: AI credits上限、スリープ制限
-- **Basic → Pro ($64)** の転換率目標: 8%
-  - トリガー: サービス数上限、RAM不足
+### SHOGUNプラン（単一プラン）
+- **月額 $62 → 年額 $49/月** の転換率目標: 60%
+  - トリガー: 年額の割引表示（25%オフ）、利用継続による自然転換
+- 14日間の無料トライアルで全機能開放
+- AIクレジットなし — BYOK（自分のAPIキーを使用）。$5のデモクレジット付与。
 
 ### BYOK効果
-- BYOK対応でチャーン削減（自分のキーを使えるなら解約しない）
-- BYOK ユーザーは無料でもアクティブに使い続ける → 口コミ効果
+- BYOK必須でユーザーのAIコスト自己管理 → プラットフォーム側のマージン安定
+- 自分のキーを使えるのでモデル選択の自由度が高い → 満足度向上
+- デモクレジット$5で初回体験のハードルを下げる
 
 ### チーム
-- Pro以上でチーム機能解放
+- チームプランは近日公開予定
 - チーム単位の請求（メンバー × 月額）
 
 ---
 
-## 5. メトリクス (KPI)
+## 5. メトリクス (KPI) — Blitz Target
 
-| 指標 | Month 1 | Month 3 | Month 6 |
-|------|---------|---------|---------|
-| Waitlist | 1,000 | - | - |
-| Total Users | 500 | 3,000 | 10,000 |
-| Paid Users | 50 | 500 | 2,000 |
-| MRR | $900 | $12,000 | $60,000 |
-| ARR | - | $144K | $720K |
-| Churn | <5% | <4% | <3% |
-| NPS | 50+ | 60+ | 70+ |
+| 指標 | Month 1 | Month 3 | Month 6 | Month 12 |
+|------|---------|---------|---------|----------|
+| Website Visitors | 300K | 1M | 3M | 10M |
+| Total Signups | 10,000 | 30,000 | 100,000 | 500,000 |
+| Paid Users | 1,500 | 8,000 | 25,000 | 100,000 |
+| MRR | $83K | $400K | $1.2M | $5M |
+| ARR | $1M | $4.8M | $15M | $60M |
+| Churn | <5% | <4% | <3% | <2% |
+| NPS | 50+ | 60+ | 70+ | 75+ |
+
+**$100M ARR Path**: Month 12 $60M → Month 18 $100M via Team plans + enterprise.
+
+See `docs/marketing/BLITZ-PLAN.md` for the full tactical playbook.
 
 ---
 

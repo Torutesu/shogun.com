@@ -94,7 +94,7 @@
 | 6.1 | 3言語サポート | EN（デフォルト）/ JA / ES（LP含む160+キー）| ✅ |
 | 6.2 | 言語自動検出 | URL param → localStorage → navigator.language → EN | ✅ |
 | 6.3 | 言語切り替えUI | ナビバー segmented control `EN · JA · ES` | ✅ |
-| 6.4 | 通貨切り替え | EN→USD / JA→JPY / ES→USD | ✅ |
+| 6.4 | 通貨表示 | USD（全ロケール共通）| ✅ |
 
 ---
 
@@ -193,7 +193,7 @@
 | 15.3 | 3 Pillars (Memory/Computer/Command) | 特徴セクション | ✅ |
 | 15.4 | How it works (4ステップ) | インストール → 学習 → 質問 → 実行 | ✅ |
 | 15.5 | Privacy セクション | 「設計で守る」 | ✅ |
-| 15.6 | Pricing セクション | 4プラン、通貨切り替え（USD/JPY）| ✅ |
+| 15.6 | Pricing セクション | 2プラン、USD表示 | ✅ |
 | 15.7 | Bottom CTA | 「Stop explaining yourself to AI」 | ✅ |
 | 15.8 | ウェイトリスト | /signupへリンク | ✅ |
 | 15.9 | i18n 全対応 | EN/JA/ES 全セクション | ✅ |

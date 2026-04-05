@@ -50,6 +50,7 @@ app.onError(errorHandler);
 // Health check (no auth)
 // ---------------------------------------------------------------------------
 app.get("/", (c) => c.json({ status: "ok", service: "shogun-api" }));
+app.get("/health", (c) => c.json({ status: "ok" }));
 
 // ---------------------------------------------------------------------------
 // Prometheus metrics (no auth — for scraping)

@@ -32,7 +32,7 @@ docs/             Architecture + API design
 - AI: Claude API (primary), OpenAI, Gemini — all with Tool Use
 - Auth: Supabase Auth (email + Google OAuth)
 - Storage: Cloudflare R2 (100GB/user)
-- Billing: Stripe (Free/Basic/Pro/Ultra)
+- Billing: Stripe (SHOGUN $49/mo annual / $62/mo monthly, BYOK for AI, 14-day trial)
 - Terminal: xterm.js + WebSocket
 - Screen capture: Electron desktopCapturer → Tesseract.js OCR
 - Transcription: OpenAI Whisper API

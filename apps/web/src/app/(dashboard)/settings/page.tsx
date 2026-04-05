@@ -13,13 +13,14 @@ import { Modal } from "@/components/ui/modal";
 import { Spinner } from "@/components/ui/loading";
 import type { AIProvider } from "@shogun/shared/types";
 
-type Tab = "profile" | "apikeys" | "memory" | "notifications" | "danger";
+type Tab = "profile" | "apikeys" | "memory" | "notifications" | "referral" | "danger";
 
 const tabs: { key: Tab; label: string }[] = [
   { key: "profile", label: "Profile" },
   { key: "apikeys", label: "API Keys" },
   { key: "memory", label: "Memory" },
   { key: "notifications", label: "Notifications" },
+  { key: "referral", label: "Referral" },
   { key: "danger", label: "Danger zone" },
 ];
 
@@ -56,6 +57,7 @@ export default function SettingsPage() {
           {activeTab === "apikeys" && <ApiKeysTab />}
           {activeTab === "memory" && <MemoryTab />}
           {activeTab === "notifications" && <NotificationsTab />}
+          {activeTab === "referral" && <ReferralTab />}
           {activeTab === "danger" && <DangerTab />}
         </div>
       </div>
@@ -354,6 +356,61 @@ function NotificationsTab() {
             <p className="text-xs text-light-text-muted dark:text-dark-text-muted">LINE messaging</p>
           </div>
           <Button size="sm" variant="secondary">Connect</Button>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+/* ---- Referral Tab ---- */
+
+function ReferralTab() {
+  const { user } = useAuth();
+  const [copied, setCopied] = useState(false);
+  const referralLink = `https://syogun.com?ref=${user?.handle ?? ""}`;
+
+  const handleCopy = useCallback(() => {
+    navigator.clipboard.writeText(referralLink).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }, [referralLink]);
+
+  return (
+    <div className="space-y-5">
+      <div>
+        <h3 className="text-sm font-medium text-light-text dark:text-dark-text mb-1">Referral Program</h3>
+        <p className="text-xs text-light-text-muted dark:text-dark-text-muted">
+          Earn 30% recurring commission for every user you refer.
+        </p>
+      </div>
+
+      <Card>
+        <div className="space-y-3">
+          <label className="text-xs font-medium tracking-wide text-light-text-muted dark:text-dark-text-muted">
+            Your referral link
+          </label>
+          <div className="flex items-center gap-2">
+            <div className="flex-1 h-10 flex items-center rounded-md border border-light-border dark:border-dark-border bg-light-card dark:bg-dark-card px-3">
+              <span className="font-mono text-xs text-light-text dark:text-dark-text truncate">
+                {referralLink}
+              </span>
+            </div>
+            <Button size="sm" onClick={handleCopy}>
+              {copied ? "Copied!" : "Copy link"}
+            </Button>
+          </div>
+        </div>
+      </Card>
+
+      <Card>
+        <div className="space-y-2">
+          <h4 className="text-xs font-mono uppercase tracking-wider text-gold">How it works</h4>
+          <ul className="space-y-1.5 text-xs text-light-text-muted dark:text-dark-text-muted">
+            <li>1. Share your referral link with friends and colleagues</li>
+            <li>2. They sign up and subscribe to any paid plan</li>
+            <li>3. You earn 30% recurring commission every month</li>
+          </ul>
         </div>
       </Card>
     </div>

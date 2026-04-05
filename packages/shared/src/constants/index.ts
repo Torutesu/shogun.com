@@ -1,92 +1,46 @@
-import type { AIModel, AIProvider, SubscriptionTier } from "../types";
+import type { AIModel, AIProvider, BillingInterval } from "../types";
 
 // =============================================================================
-// Subscription Tier Limits
+// Subscription Plan
 // =============================================================================
 
-export interface TierConfig {
-  tier: SubscriptionTier;
-  priceUsd: number;
-  priceJpy: number;
-  creditsIncludedCents: number;
+export interface PlanConfig {
+  name: string;
+  priceMonthlyUsd: number;   // monthly billing: $62/mo
+  priceAnnualUsd: number;    // annual billing: $49/mo ($588/yr)
+  demoCreditsCents: number;  // one-time demo credits for new users
   cpuCores: number;
   memoryMb: number;
   storageGb: number;
   maxServices: number;
   customDomain: boolean;
   alwaysOn: boolean;
-  rateLimitPerMin: number;
-  maxWsConnections: number;
   maxUploadMb: number;
-  prioritySupport: boolean;
 }
 
-export const TIER_CONFIGS: Record<SubscriptionTier, TierConfig> = {
-  free: {
-    tier: "free",
-    priceUsd: 0,
-    priceJpy: 0,
-    creditsIncludedCents: 0,
-    cpuCores: 1,
-    memoryMb: 256,
-    storageGb: 100,
-    maxServices: 1,
-    customDomain: false,
-    alwaysOn: false,
-    rateLimitPerMin: 30,
-    maxWsConnections: 1,
-    maxUploadMb: 10,
-    prioritySupport: false,
-  },
-  basic: {
-    tier: "basic",
-    priceUsd: 18,
-    priceJpy: 2700,
-    creditsIncludedCents: 1000,
-    cpuCores: 4,
-    memoryMb: 32768,
-    storageGb: 100,
-    maxServices: 5,
-    customDomain: true,
-    alwaysOn: true,
-    rateLimitPerMin: 120,
-    maxWsConnections: 3,
-    maxUploadMb: 100,
-    prioritySupport: false,
-  },
-  pro: {
-    tier: "pro",
-    priceUsd: 64,
-    priceJpy: 9500,
-    creditsIncludedCents: 4000,
-    cpuCores: 16,
-    memoryMb: 131072,
-    storageGb: 100,
-    maxServices: 10,
-    customDomain: true,
-    alwaysOn: true,
-    rateLimitPerMin: 300,
-    maxWsConnections: 5,
-    maxUploadMb: 500,
-    prioritySupport: true,
-  },
-  ultra: {
-    tier: "ultra",
-    priceUsd: 200,
-    priceJpy: 30000,
-    creditsIncludedCents: 10000,
-    cpuCores: 64,
-    memoryMb: 524288,
-    storageGb: 100,
-    maxServices: 50,
-    customDomain: true,
-    alwaysOn: true,
-    rateLimitPerMin: 600,
-    maxWsConnections: 10,
-    maxUploadMb: 1000,
-    prioritySupport: true,
-  },
+export const PLAN: PlanConfig = {
+  name: "SHOGUN",
+  priceMonthlyUsd: 62,       // $62/mo (25% markup over annual)
+  priceAnnualUsd: 49,        // $49/mo billed annually ($588/yr)
+  demoCreditsCents: 500,     // $5 one-time demo credits
+  cpuCores: 8,
+  memoryMb: 65536,           // 64GB
+  storageGb: 100,
+  maxServices: 10,
+  customDomain: true,
+  alwaysOn: true,
+  maxUploadMb: 500,
 };
+
+// Annual savings
+export const ANNUAL_TOTAL_USD = PLAN.priceAnnualUsd * 12;    // $588
+export const MONTHLY_TOTAL_USD = PLAN.priceMonthlyUsd * 12;  // $744
+export const ANNUAL_SAVINGS_USD = MONTHLY_TOTAL_USD - ANNUAL_TOTAL_USD; // $156
+
+// For backwards compatibility — maps the single tier
+export const TIER_CONFIGS = {
+  shogun: PLAN,
+} as const;
 
 // =============================================================================
 // AI Model Metadata

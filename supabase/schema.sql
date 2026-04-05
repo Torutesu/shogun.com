@@ -14,7 +14,8 @@ create extension if not exists "pg_trgm";      -- trigram for fuzzy text search
 -- Enums
 -- =============================================================================
 
-create type subscription_tier as enum ('free', 'basic', 'pro', 'ultra');
+create type subscription_tier as enum ('shogun');
+create type billing_interval as enum ('monthly', 'annual');
 create type machine_status as enum ('provisioning', 'running', 'sleeping', 'stopped', 'error');
 create type ai_provider as enum ('anthropic', 'openai', 'google');
 create type ai_model as enum (
@@ -62,11 +63,12 @@ create unique index profiles_handle_idx on profiles (lower(handle));
 create table subscriptions (
   id                  uuid primary key default uuid_generate_v4(),
   user_id             uuid not null references profiles(id) on delete cascade,
-  tier                subscription_tier not null default 'free',
+  tier                subscription_tier not null default 'shogun',
+  billing_interval    billing_interval not null default 'annual',
   stripe_customer_id  text unique,
   stripe_subscription_id text unique,
-  ai_credits_balance  integer not null default 0,   -- cents
-  ai_credits_included integer not null default 0,   -- monthly included (cents)
+  demo_credits_remaining integer not null default 500,  -- one-time $5 demo credits (cents)
+  trial_ends_at       timestamptz,                       -- 14-day trial
   current_period_start timestamptz,
   current_period_end   timestamptz,
   cancel_at_period_end boolean not null default false,
@@ -528,7 +530,7 @@ create table teams (
   avatar_url      text,
   owner_id        uuid not null references profiles(id) on delete cascade,
   max_members     integer not null default 10,
-  plan            subscription_tier not null default 'pro',
+  plan            subscription_tier not null default 'shogun',
   stripe_customer_id text unique,
   sso_config      jsonb,
   created_at      timestamptz not null default now(),

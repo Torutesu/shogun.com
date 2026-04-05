@@ -5,7 +5,7 @@ const ja: Record<keyof typeof en, string> = {
   "common.appName": "SHOGUN",
   "common.tagline": "あなたの仕事を知っている、唯一のAI。",
   "common.subtitle": "すべてを記憶する。すべてをこなす。",
-  "common.cta.earlyAccess": "早期アクセスを申し込む",
+  "common.cta.earlyAccess": "無料トライアルを始める",
   "common.cta.howItWorks": "使い方を見る",
   "common.loading": "読み込み中...",
   "common.error": "エラーが発生しました",
@@ -80,13 +80,11 @@ const ja: Record<keyof typeof en, string> = {
   "billing.credits": "AIクレジット",
   "billing.creditsRemaining": "今月の残り",
   "billing.byok": "自分のAPIキーを使う",
-  "billing.byokHint": "自分のAPIキーを使用 — クレジット消費なし",
+  "billing.byokHint": "自分のAPIキーを接続 — Claude, GPT, Gemini。プロバイダーに直接お支払い。",
 
   // Tiers
-  "tier.free": "フリー",
-  "tier.basic": "ベーシック",
-  "tier.pro": "プロ",
-  "tier.ultra": "ウルトラ",
+  "tier.shogun": "SHOGUN",
+  "tier.team": "チーム",
 
   // Services
   "services.title": "サービス",
@@ -122,12 +120,12 @@ const ja: Record<keyof typeof en, string> = {
 
   // LP Hero
   "lp.hero.eyebrow": "AIクラウドコンピュータ · ワークメモリ · 自動化",
-  "lp.hero.tagline": "あなたの仕事を知っている、唯一のAI。",
-  "lp.hero.subtitle": "すべてを記憶する。すべてをこなす。",
+  "lp.hero.tagline": "すべてを統治するAI、将軍。",
+  "lp.hero.subtitle": "あらゆるツール。あらゆるタブ。あらゆるタスク。一つの司令塔。",
   "lp.hero.bottomNote": "syogun.com · Select KK（東京）が開発",
 
   // LP Pain
-  "lp.pain.title": "AIに同じ説明を、何度繰り返しましたか？",
+  "lp.pain.title": "AIに同じ説明を何度繰り返しましたか？ここで終わりです。",
   "lp.pain.quote1": "背景を説明すると...",
   "lp.pain.quote2": "先週決めたのは...",
   "lp.pain.quote3": "これを作っている理由は...",
@@ -157,30 +155,34 @@ const ja: Record<keyof typeof en, string> = {
   "lp.howItWorks.step4.body": "コードを実行、サービスをデプロイ、タスクを自動化 — すべて一つの会話から。",
 
   // LP Pricing
-  "lp.pricing.title": "シンプルな料金体系",
-  "lp.pricing.subtitle": "無料で始める。準備ができたらスケール。",
+  "lp.pricing.title": "1プラン。全部入り。",
+  "lp.pricing.subtitle": "比較するプランなし。ロックされた機能なし。SHOGUNだけ。",
   "lp.pricing.monthly": "/月",
-  "lp.pricing.free.description": "基本機能でSHOGUNを試す",
-  "lp.pricing.basic.description": "フル体験を求める個人向け",
-  "lp.pricing.pro.description": "パワーユーザーとプロフェッショナル向け",
-  "lp.pricing.ultra.description": "チームと高負荷ワークロード向け",
-  "lp.pricing.mostPopular": "一番人気",
-  "lp.pricing.features.credits": "AIクレジット {amount}/月",
-  "lp.pricing.features.cpu": "{count}コアCPU",
-  "lp.pricing.features.memory": "RAM {amount}",
-  "lp.pricing.features.storage": "ストレージ {amount}GB",
-  "lp.pricing.features.services": "最大{count}サービス",
-  "lp.pricing.features.customDomain": "カスタムドメイン",
-  "lp.pricing.features.alwaysOn": "常時稼働マシン",
-  "lp.pricing.features.priority": "優先サポート",
-  "lp.pricing.features.byok": "自分のAPIキーを持ち込み可能",
-  "lp.pricing.cta.free": "無料で始める",
-  "lp.pricing.cta.paid": "早期アクセスを申し込む",
+  "lp.pricing.plan.name": "SHOGUN",
+  "lp.pricing.plan.description": "あなたのAIクラウドコンピュータ。フルパワー。制限なし。",
+  "lp.pricing.plan.annualNote": "月額、年間一括払い（$588/年）",
+  "lp.pricing.plan.monthlyNote": "月額、月払い",
+  "lp.pricing.plan.annualSave": "年間一括で$156お得",
+  "lp.pricing.plan.cta": "14日間無料トライアルを始める",
+  "lp.pricing.plan.feature1": "専用クラウドコンピュータ（8コア、64GB RAM）",
+  "lp.pricing.plan.feature2": "ワークメモリ — 画面キャプチャ、会議文字起こし、セマンティック検索",
+  "lp.pricing.plan.feature3": "全AIモデル対応 — 自分のAPIキーを接続（Claude, GPT, Gemini）",
+  "lp.pricing.plan.feature4": "カスタムドメイン、常時稼働サーバー、100GBストレージ",
+  "lp.pricing.plan.feature5": "APIキー接続前にお試しできる$5分のデモクレジット付き",
+  "lp.pricing.plan.byokNote": "AIのAPIキーはご自身で用意。AI利用料は一切かかりません。",
+  "lp.pricing.team.title": "チーム",
+  "lp.pricing.team.description": "共有ワークスペース、チームメモリ、監査ログ。",
+  "lp.pricing.team.cta": "近日公開",
+
+  // LP Waitlist
+  "lp.waitlist.placeholder": "メールアドレスを入力",
+  "lp.waitlist.cta": "ウェイトリストに参加",
+  "lp.waitlist.success": "登録完了。アクセス開放時にお知らせします。",
 
   // LP Bottom CTA
   "lp.bottomCta.title": "AIに自分を説明するのはもうやめよう。",
   "lp.bottomCta.subtitle": "SHOGUNはすでに知っている。",
-  "lp.bottomCta.note": "無料で開始 · クレジットカード不要 · syogun.com",
+  "lp.bottomCta.note": "14日間無料トライアル · $5デモクレジット · AI利用マークアップなし · syogun.com",
 
   // LP Footer
   "lp.footer.copyright": "© 2026 Select KK. All rights reserved.",

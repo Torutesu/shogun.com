@@ -49,7 +49,7 @@ Every paying user gets a dedicated Fly.io Machine (Linux container). This is the
 
 **Why Fly.io Machines:**
 - Start/stop in ~300ms (no cold start pain)
-- Per-second billing (sleep when idle for free tier)
+- Per-second billing (sleep when idle)
 - Volumes for persistent storage
 - Global regions (nrt for Japan users, iad for US)
 
@@ -59,7 +59,7 @@ Sign up → Provisioning (create Fly app + machine + volume)
            ↓
          Running (user active)
            ↓
-         Sleeping (free tier: after 30min idle)
+         Sleeping (after 30min idle)
            ↓
          Running (wake on request)
            ↓
@@ -67,12 +67,9 @@ Sign up → Provisioning (create Fly app + machine + volume)
 ```
 
 **Tier → Resource Mapping:**
-| Tier  | CPU  | RAM    | Storage | Always On |
-|-------|------|--------|---------|-----------|
-| Free  | 1    | 256MB  | 100GB   | No        |
-| Basic | 4    | 32GB   | 100GB+  | Yes       |
-| Pro   | 16   | 128GB  | 100GB+  | Yes       |
-| Ultra | 64   | 512GB  | 100GB+  | Yes       |
+| Tier     | CPU  | RAM    | Storage | Always On |
+|----------|------|--------|---------|-----------|
+| SHOGUN   | 8    | 64GB   | 100GB   | Yes       |
 
 ### 2. WebSocket Architecture
 
@@ -169,7 +166,7 @@ User: "What did I work on this week?"
 ```
 1. User signs up (email or Google OAuth via Supabase Auth)
 2. Choose handle → validate uniqueness → create profile
-3. Create subscription (free tier)
+3. Create subscription (shogun tier, 14-day trial, choose annual or monthly billing)
 4. Provision Fly.io Machine (async, ~15s)
 5. During provisioning: personalization questions
 6. Machine ready → redirect to dashboard
@@ -189,8 +186,8 @@ User selects model in chat UI
   ↓
 API checks:
   1. Is this a BYOK key? → Use user's key, no charge
-  2. Does user have credits? → Use platform key, deduct credits
-  3. No credits? → Reject (or downgrade to free model)
+  2. Does user have demo credits remaining? → Use platform key, deduct credits
+  3. No credits and no BYOK? → Prompt to add API key
   ↓
 Route to provider:
   - anthropic → Claude API (tool_use supported)

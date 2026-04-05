@@ -8,7 +8,8 @@ export const LOCALES = ["en", "ja", "es"] as const;
 export const DEFAULT_LOCALE: Locale = "en";
 
 // Subscription
-export type SubscriptionTier = "free" | "basic" | "pro" | "ultra";
+export type SubscriptionTier = "shogun";
+export type BillingInterval = "monthly" | "annual";
 
 // AI
 export type AIProvider = "anthropic" | "openai" | "google";
