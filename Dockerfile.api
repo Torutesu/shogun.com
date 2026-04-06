@@ -20,14 +20,15 @@ WORKDIR /app
 COPY --from=deps /app/ ./
 COPY . .
 RUN pnpm --filter @shogun/api build
+RUN pnpm deploy --filter @shogun/api --prod /prod/api
 
 FROM node:20-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 
+COPY --from=builder /prod/api/node_modules ./node_modules
+COPY --from=builder /prod/api/package.json ./package.json
 COPY --from=builder /app/apps/api/dist ./dist
-COPY --from=builder /app/apps/api/package.json ./package.json
-COPY --from=deps /app/node_modules ./node_modules
 
 EXPOSE 3001
 CMD ["node", "dist/index.cjs"]
