@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsup src/index.ts --format esm --dts --noExternal @hono/node-server --noExternal hono --noExternal @hono/zod-validator --noExternal stripe --noExternal zod",
+    "build": "tsup src/index.ts --format esm --dts",
     "start": "node dist/index.js",
     "lint": "eslint src/",
     "type-check": "tsc --noEmit"
