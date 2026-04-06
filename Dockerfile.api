@@ -27,8 +27,6 @@ ENV NODE_ENV=production
 
 COPY --from=builder /app/apps/api/dist ./dist
 COPY --from=builder /app/apps/api/package.json ./package.json
-
-# Copy node_modules from deps (needed for native modules like better-sqlite3)
 COPY --from=deps /app/node_modules ./node_modules
 
 EXPOSE 3001
